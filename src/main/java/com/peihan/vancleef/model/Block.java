@@ -34,4 +34,11 @@ public class Block {
      */
     private long timeStamp;
 
+
+    /**
+     * 随机数 用来完成pow
+     * 创世区块的nonce为0
+     */
+    private long nonce;
+
 }

@@ -13,8 +13,15 @@ public class TestAll {
 
     @Test
     public void testSize() throws Exception {
-        String ss = "3386d37d7b8e5279d9ee20d3a9607635e67fcd8edd58ca84c864464d49fcd94a";
-        System.out.println(ss.length());
+        //String ss = "3386d37d7b8e5279d9ee20d3a9607635e67fcd8edd58ca84c864464d49fcd94a";
+        //System.out.println(ss.length());
+
+        int a = 1;
+        int b = 2;
+        String aa= "1";
+
+        String ss = a + b + aa;
+        System.out.println(ss);
     }
 
 }

@@ -1,8 +1,11 @@
 package com.peihan.vancleef.model;
 
 
+import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.util.MagicUtil;
 import lombok.Data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.List;
 @Data
 public class BlockChain {
 
+    private static final Logger logger = LogManager.getLogger();
+
     /**
      * 区块链
      */
@@ -20,6 +25,7 @@ public class BlockChain {
 
     /**
      * 获取创世区块
+     * 创世区块nonce为0
      */
     private Block makeGenesisBlock() {
         Block block = new Block();
@@ -27,6 +33,7 @@ public class BlockChain {
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setData("this is the genesis block");
+        block.setNonce(0);
         block.setHash(MagicUtil.hash(block));
         return block;
     }
@@ -39,7 +46,6 @@ public class BlockChain {
         blockChain.add(makeGenesisBlock());
     }
 
-
     /**
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
@@ -49,11 +55,11 @@ public class BlockChain {
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setPreviousHash(lastBlock().getHash());
         block.setIndex(lastBlock().getIndex() + 1);
-        block.setHash(MagicUtil.hash(block));
+        //需要进行执行pow算法
+        Pow.pow(block);
         blockChain.add(block);
         return lastIndex();
     }
-
 
     public void showAllBlocks() {
         blockChain.forEach(System.out::println);
