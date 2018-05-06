@@ -12,6 +12,9 @@ public class TestBlockChain {
         blockChain.initBlockChain();
         blockChain.addBlock("Hello");
         blockChain.addBlock("world");
+        if (!blockChain.isBlockChainValid()) {
+            throw new Exception("区块链非法");
+        }
         blockChain.showAllBlocks();
     }
 }

@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 区块链
@@ -63,6 +64,37 @@ public class BlockChain {
 
     public void showAllBlocks() {
         blockChain.forEach(System.out::println);
+    }
+
+    public boolean isBlockChainValid() {
+        if (blockChain == null || blockChain.size() < 1) {
+            return false;
+        }
+        //只有创世区块
+        else if (blockChain.size() == 1) {
+            Block block = blockChain.get(0);
+            if (!Objects.equals(block.getPreviousHash(), "0")) {
+                return false;
+            }
+        } else {
+            //从创世区块之后的第一个区块开始
+            for (int i = 1; i < blockChain.size(); i++) {
+                Block currentBlock = blockChain.get(i);
+                Block preBlock = blockChain.get(i - 1);
+                if (currentBlock == null || preBlock == null) {
+                    return false;
+                }
+                //当前区块的hash必须和对整个区块做hash的结果一样
+                if (!Objects.equals(currentBlock.getHash(), MagicUtil.hash(currentBlock))) {
+                    return false;
+                }
+                //当前区块的preHash必须和前一个区块一样
+                if (!Objects.equals(currentBlock.getPreviousHash(), MagicUtil.hash(preBlock))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
