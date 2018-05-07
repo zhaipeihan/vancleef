@@ -1,7 +1,10 @@
 package com.peihan.vancleef.model;
 
 
+import com.peihan.vancleef.exception.InvalidBlockException;
+import com.peihan.vancleef.exception.base.ServiceException;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 public class Block {
@@ -40,5 +43,18 @@ public class Block {
      * 创世区块的nonce为0
      */
     private long nonce;
+
+
+    public static void checkBlock(Block block) throws ServiceException{
+        if(block == null){
+            throw new InvalidBlockException("block不能为空");
+        }
+        if(StringUtils.isEmpty(block.getPreviousHash())){
+            throw new InvalidBlockException("previousHash不能为空");
+        }
+        if(StringUtils.isEmpty(block.getHash())){
+            throw new InvalidBlockException("hash不能为空");
+        }
+    }
 
 }
