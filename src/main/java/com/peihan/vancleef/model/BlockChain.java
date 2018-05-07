@@ -1,15 +1,12 @@
 package com.peihan.vancleef.model;
 
 
-import com.peihan.vancleef.action.Pow;
+import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.util.MagicUtil;
+import com.peihan.vancleef.util.StorageUtil;
 import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * 区块链
@@ -18,11 +15,10 @@ import java.util.Objects;
 public class BlockChain {
 
     private static final Logger logger = LogManager.getLogger();
+    private final StorageUtil storage = StorageUtil.getInstance();
 
-    /**
-     * 区块链
-     */
-    private List<Block> blockChain;
+    private String lastBlockHash;
+
 
     /**
      * 获取创世区块
@@ -40,17 +36,33 @@ public class BlockChain {
     }
 
     /**
-     * 初始化初始化，并且增加一个创世区块
+     * 初始化区块链，并且增加一个创世区块
      */
-    public void initBlockChain() {
-        blockChain = new ArrayList<>();
-        blockChain.add(makeGenesisBlock());
+    public void initBlockChain() throws ServiceException {
+        Block genesisBlock = makeGenesisBlock();
+        addBlock(genesisBlock);
     }
+
+    /**
+     * 增加一个区块
+     * @param block
+     * @throws ServiceException
+     */
+    public void addBlock(Block block) throws ServiceException {
+        storage.putBlock(block);
+        storage.putLastBlockHash(block.getHash());
+        refreshLastBlockHash();
+    }
+
+    private void refreshLastBlockHash() throws ServiceException {
+        this.lastBlockHash = storage.getLastBlockHash();
+    }
+
 
     /**
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
-    public long addBlock(String data) {
+    /*public long addBlock(String data) throws ServiceException {
         Block block = new Block();
         block.setData(data);
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
@@ -58,14 +70,12 @@ public class BlockChain {
         block.setIndex(lastBlock().getIndex() + 1);
         //需要进行执行pow算法
         Pow.pow(block);
-        blockChain.add(block);
+
+        addBlock(block);
         return lastIndex();
-    }
+    }*/
 
-    public void showAllBlocks() {
-        blockChain.forEach(System.out::println);
-    }
-
+    /*
     public boolean isBlockChainValid() {
         if (blockChain == null || blockChain.size() < 1) {
             return false;
@@ -96,14 +106,7 @@ public class BlockChain {
         }
         return true;
     }
+    */
 
-
-    private Block lastBlock() {
-        return blockChain.get(lastIndex());
-    }
-
-    private int lastIndex() {
-        return blockChain.size() - 1;
-    }
 
 }

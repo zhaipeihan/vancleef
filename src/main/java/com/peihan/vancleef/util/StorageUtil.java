@@ -23,7 +23,7 @@ public class StorageUtil {
     //区块链上最后一个区块的hash
     private static final String LAST_BLOCK_HASH = "l";
 
-    public RocksDB rocksDB;
+    private RocksDB rocksDB;
 
     private volatile static StorageUtil INSTANCE;
 
@@ -31,7 +31,7 @@ public class StorageUtil {
         if (INSTANCE == null) {
             synchronized (StorageUtil.class) {
                 if (INSTANCE == null) {
-                    return new StorageUtil();
+                    INSTANCE = new StorageUtil();
                 }
             }
         }
@@ -81,7 +81,7 @@ public class StorageUtil {
     }
 
 
-    public String getLastHash() throws ServiceException {
+    public String getLastBlockHash() throws ServiceException {
         String lastHash = null;
         try {
             lastHash = (String) SerializeUtil.deSerialize(rocksDB.get(SerializeUtil.serialize(LAST_BLOCK_HASH)));
@@ -92,7 +92,7 @@ public class StorageUtil {
         return lastHash;
     }
 
-    public void putLastHash(String lastHash) throws ServiceException {
+    public void putLastBlockHash(String lastHash) throws ServiceException {
         try {
             rocksDB.put(SerializeUtil.serialize(LAST_BLOCK_HASH), SerializeUtil.serialize(lastHash));
         } catch (Exception e) {
