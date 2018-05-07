@@ -9,12 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class Block {
 
-
-    /**
-     * 区块索引
-     */
-    private long index;
-
     /**
      * 当前区块hash
      */

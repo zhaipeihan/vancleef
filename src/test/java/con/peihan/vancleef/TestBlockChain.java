@@ -2,7 +2,6 @@ package con.peihan.vancleef;
 
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
-import com.peihan.vancleef.util.StorageUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -15,9 +14,13 @@ public class TestBlockChain {
     public void testBlockChain() throws Exception {
         BlockChain blockChain = new BlockChain();
         blockChain.initBlockChain();
-        String lastHash = StorageUtil.getInstance().getLastBlockHash();
-        logger.info("当前最后一个区块hash为{}", lastHash);
-        Block block = StorageUtil.getInstance().getBlock(lastHash);
-        logger.info("最后一个区块信息为{}", block);
+        blockChain.addBlock("hello");
+        blockChain.addBlock("world");
+        BlockChain.BlockChainIterator blockChainIterator = blockChain.getBlockChainIterator();
+        while (blockChainIterator.hasNext()){
+            Block block = blockChainIterator.next();
+            logger.info("当前区块信息为{}",block);
+        }
+
     }
 }

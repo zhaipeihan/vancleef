@@ -17,7 +17,7 @@ public class MagicUtil {
             return "";
         }
         //将整个区块做hash
-        String source = String.valueOf(block.getIndex()) + block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(block.getNonce());
+        String source = block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(block.getNonce());
         return DigestUtils.sha256Hex(source);
     }
 
@@ -25,7 +25,7 @@ public class MagicUtil {
         if (block == null) {
             return "";
         }
-        String source = String.valueOf(block.getIndex()) + block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(nonce);
+        String source = block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(nonce);
         return DigestUtils.sha256Hex(source);
     }
 

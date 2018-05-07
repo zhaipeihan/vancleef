@@ -1,10 +1,12 @@
 package com.peihan.vancleef.model;
 
 
+import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +21,39 @@ public class BlockChain {
 
     private String lastBlockHash;
 
+    public class BlockChainIterator {
+
+        private String currentBlockHash;
+
+        public BlockChainIterator(String currentBlockHash) {
+            this.currentBlockHash = currentBlockHash;
+        }
+
+        public boolean hasNext() {
+            if (StringUtils.isEmpty(currentBlockHash)) {
+                return false;
+            }
+            Block block = null;
+            try {
+                block = storage.getBlock(currentBlockHash);
+            } catch (ServiceException e) {
+                logger.error("get block error exception:{}", e);
+            }
+            return block != null;
+        }
+
+        public Block next() throws ServiceException {
+            Block block = storage.getBlock(currentBlockHash);
+            currentBlockHash = block.getPreviousHash();
+            return block;
+        }
+    }
+
+
+    public BlockChainIterator getBlockChainIterator(){
+        return new BlockChainIterator(this.lastBlockHash);
+    }
+
 
     /**
      * 获取创世区块
@@ -26,7 +61,6 @@ public class BlockChain {
      */
     private Block makeGenesisBlock() {
         Block block = new Block();
-        block.setIndex(0);
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setData("this is the genesis block");
@@ -45,6 +79,7 @@ public class BlockChain {
 
     /**
      * 增加一个区块
+     *
      * @param block
      * @throws ServiceException
      */
@@ -62,18 +97,15 @@ public class BlockChain {
     /**
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
-    /*public long addBlock(String data) throws ServiceException {
+    public void addBlock(String data) throws ServiceException {
         Block block = new Block();
         block.setData(data);
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setPreviousHash(lastBlock().getHash());
-        block.setIndex(lastBlock().getIndex() + 1);
+        block.setPreviousHash(lastBlockHash);
         //需要进行执行pow算法
         Pow.pow(block);
-
         addBlock(block);
-        return lastIndex();
-    }*/
+    }
 
     /*
     public boolean isBlockChainValid() {

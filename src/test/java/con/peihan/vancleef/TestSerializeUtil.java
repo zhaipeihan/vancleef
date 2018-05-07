@@ -12,7 +12,6 @@ public class TestSerializeUtil {
     @Test
     public void testSerializeAndDeSerialize() throws Exception {
         Block block = new Block();
-        block.setIndex(0);
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setData("this is the genesis block");
