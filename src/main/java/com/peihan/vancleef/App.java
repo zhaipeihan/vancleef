@@ -14,7 +14,7 @@ public class App {
 
     public static void main(String[] args) throws ServiceException {
         BlockChain blockChain = new BlockChain();
-        blockChain.initBlockChain();
+        blockChain.createBlockChain();
         String lastHash = StorageUtil.getInstance().getLastBlockHash();
         logger.info("当前最后一个区块hash为{}", lastHash);
         Block block = StorageUtil.getInstance().getBlock(lastHash);

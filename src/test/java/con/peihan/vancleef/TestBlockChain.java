@@ -13,7 +13,7 @@ public class TestBlockChain {
     @Test
     public void testBlockChain() throws Exception {
         BlockChain blockChain = new BlockChain();
-        blockChain.initBlockChain();
+        blockChain.createBlockChain();
         blockChain.addBlock("hello");
         blockChain.addBlock("world");
         BlockChain.BlockChainIterator blockChainIterator = blockChain.getBlockChainIterator();

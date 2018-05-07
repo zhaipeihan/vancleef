@@ -13,10 +13,10 @@ import org.apache.logging.log4j.Logger;
 /**
  * 区块链
  */
-@Data
 public class BlockChain {
 
     private static final Logger logger = LogManager.getLogger();
+
     private final StorageUtil storage = StorageUtil.getInstance();
 
     private String lastBlockHash;
@@ -49,9 +49,39 @@ public class BlockChain {
         }
     }
 
-
+    /**
+     * 获取区块链的迭代器
+     * @return
+     */
     public BlockChainIterator getBlockChainIterator(){
         return new BlockChainIterator(this.lastBlockHash);
+    }
+
+    /**
+     * 创建区块链
+     * 先查看rocksdb里有没有对应的区块链信息，如果有，从rocksdb里创建，否则创建新的区块链
+     *
+     */
+    public void createBlockChain() throws ServiceException {
+        String lastBlockHash = storage.getLastBlockHash();
+        if(StringUtils.isEmpty(lastBlockHash)){
+            initBlockChain();
+        }else{
+            refreshLastBlockHash();
+        }
+    }
+
+    /**
+     * 向区块链中添加一个区块，返回当前区块链中的最后索引
+     */
+    public void addBlock(String data) throws ServiceException {
+        Block block = new Block();
+        block.setData(data);
+        block.setTimeStamp(MagicUtil.getNowTimeStamp());
+        block.setPreviousHash(lastBlockHash);
+        //需要进行执行pow算法
+        Pow.pow(block);
+        addBlock(block);
     }
 
 
@@ -72,7 +102,7 @@ public class BlockChain {
     /**
      * 初始化区块链，并且增加一个创世区块
      */
-    public void initBlockChain() throws ServiceException {
+    private void initBlockChain() throws ServiceException {
         Block genesisBlock = makeGenesisBlock();
         addBlock(genesisBlock);
     }
@@ -83,7 +113,7 @@ public class BlockChain {
      * @param block
      * @throws ServiceException
      */
-    public void addBlock(Block block) throws ServiceException {
+    private void addBlock(Block block) throws ServiceException {
         storage.putBlock(block);
         storage.putLastBlockHash(block.getHash());
         refreshLastBlockHash();
@@ -93,19 +123,6 @@ public class BlockChain {
         this.lastBlockHash = storage.getLastBlockHash();
     }
 
-
-    /**
-     * 向区块链中添加一个区块，返回当前区块链中的最后索引
-     */
-    public void addBlock(String data) throws ServiceException {
-        Block block = new Block();
-        block.setData(data);
-        block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setPreviousHash(lastBlockHash);
-        //需要进行执行pow算法
-        Pow.pow(block);
-        addBlock(block);
-    }
 
     /*
     public boolean isBlockChainValid() {
