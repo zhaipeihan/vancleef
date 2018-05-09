@@ -3,12 +3,15 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.base.ServiceException;
+import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 区块链
@@ -20,6 +23,19 @@ public class BlockChain {
     private final StorageUtil storage = StorageUtil.getInstance();
 
     private String lastBlockHash;
+
+    private volatile static BlockChain INSTANCE;
+
+    public static BlockChain getInstance() {
+        if (INSTANCE == null) {
+            synchronized (BlockChain.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new BlockChain();
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
     public class BlockChainIterator {
 
@@ -51,22 +67,22 @@ public class BlockChain {
 
     /**
      * 获取区块链的迭代器
+     *
      * @return
      */
-    public BlockChainIterator getBlockChainIterator(){
+    public BlockChainIterator getBlockChainIterator() {
         return new BlockChainIterator(this.lastBlockHash);
     }
 
     /**
      * 创建区块链
      * 先查看rocksdb里有没有对应的区块链信息，如果有，从rocksdb里创建，否则创建新的区块链
-     *
      */
     public void createBlockChain() throws ServiceException {
         String lastBlockHash = storage.getLastBlockHash();
-        if(StringUtils.isEmpty(lastBlockHash)){
+        if (StringUtils.isEmpty(lastBlockHash)) {
             initBlockChain();
-        }else{
+        } else {
             refreshLastBlockHash();
         }
     }
@@ -85,6 +101,16 @@ public class BlockChain {
     }
 
 
+    public List<Block> getAllBlocks() throws ServiceException {
+        List<Block> blocks = new ArrayList<>();
+        BlockChainIterator iterator = getBlockChainIterator();
+        while (iterator.hasNext()){
+            blocks.add(iterator.next());
+        }
+        return blocks;
+    }
+
+
     /**
      * 获取创世区块
      * 创世区块nonce为0
@@ -95,7 +121,7 @@ public class BlockChain {
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setData("this is the genesis block");
         block.setNonce(0);
-        block.setHash(MagicUtil.hash(block));
+        block.setHash(HashUtil.hash(block));
         return block;
     }
 
@@ -122,6 +148,8 @@ public class BlockChain {
     private void refreshLastBlockHash() throws ServiceException {
         this.lastBlockHash = storage.getLastBlockHash();
     }
+
+
 
 
     /*

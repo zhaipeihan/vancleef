@@ -1,6 +1,7 @@
 package con.peihan.vancleef;
 
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.SerializeUtil;
 import org.junit.Test;
@@ -16,7 +17,7 @@ public class TestSerializeUtil {
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setData("this is the genesis block");
         block.setNonce(0);
-        block.setHash(MagicUtil.hash(block));
+        block.setHash(HashUtil.hash(block));
 
         byte[] bytes = SerializeUtil.serialize(block);
         System.out.println(Arrays.toString(bytes));

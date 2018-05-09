@@ -12,23 +12,6 @@ public class MagicUtil {
         return System.currentTimeMillis() / 1000;
     }
 
-    public static String hash(Block block) {
-        if (block == null) {
-            return "";
-        }
-        //将整个区块做hash
-        String source = block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(block.getNonce());
-        return DigestUtils.sha256Hex(source);
-    }
-
-    public static String hashWithNonce(Block block, long nonce) {
-        if (block == null) {
-            return "";
-        }
-        String source = block.getPreviousHash() + String.valueOf(block.getTimeStamp()) + block.getData() + String.valueOf(nonce);
-        return DigestUtils.sha256Hex(source);
-    }
-
     public static String makeEmptyHashStr() {
         StringBuilder stringBuilder = new StringBuilder();
 

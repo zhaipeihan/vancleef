@@ -1,6 +1,7 @@
 package com.peihan.vancleef.action;
 
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,14 +24,14 @@ public class Pow {
         long nonce = 0;
 
         long startTime = System.currentTimeMillis();
-        while (!isHashValid(MagicUtil.hashWithNonce(block, nonce))) {
+        while (!isHashValid(HashUtil.hashWithNonce(block, nonce))) {
             nonce++;
         }
         long endTime = System.currentTimeMillis();
 
         //工作量证明通过之后写入nonce和hash
         block.setNonce(nonce);
-        block.setHash(MagicUtil.hash(block));
+        block.setHash(HashUtil.hash(block));
 
         logger.info("当前正在执行pow的区块信息为{},pow执行时间为{}ms", block, endTime - startTime);
 
