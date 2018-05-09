@@ -20,11 +20,10 @@ public class Block {
     private String previousHash;
 
     /**
-     * 数据
-     * 根据应用的具体情况可以存放不同的数据
-     * 可以存放JSON数据
+     * 交易数据
+     *
      */
-    private String data;
+    private Transaction[] transactions;
 
     /**
      * 时间戳
@@ -39,14 +38,14 @@ public class Block {
     private long nonce;
 
 
-    public static void checkBlock(Block block) throws ServiceException{
-        if(block == null){
+    public static void checkBlock(Block block) throws ServiceException {
+        if (block == null) {
             throw new InvalidBlockException("block不能为空");
         }
-        if(StringUtils.isEmpty(block.getPreviousHash())){
+        if (StringUtils.isEmpty(block.getPreviousHash())) {
             throw new InvalidBlockException("previousHash不能为空");
         }
-        if(StringUtils.isEmpty(block.getHash())){
+        if (StringUtils.isEmpty(block.getHash())) {
             throw new InvalidBlockException("hash不能为空");
         }
     }

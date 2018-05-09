@@ -1,6 +1,7 @@
 package con.peihan.vancleef;
 
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.model.Transaction;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.SerializeUtil;
@@ -15,7 +16,7 @@ public class TestSerializeUtil {
         Block block = new Block();
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setData("this is the genesis block");
+        block.setTransactions(new Transaction[]{});
         block.setNonce(0);
         block.setHash(HashUtil.hash(block));
 

@@ -90,9 +90,9 @@ public class BlockChain {
     /**
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
-    public void addBlock(String data) throws ServiceException {
+    public void addBlock(Transaction[] transactions) throws ServiceException {
         Block block = new Block();
-        block.setData(data);
+        block.setTransactions(transactions);
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
         block.setPreviousHash(lastBlockHash);
         //需要进行执行pow算法
@@ -119,7 +119,7 @@ public class BlockChain {
         Block block = new Block();
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setData("this is the genesis block");
+        block.setTransactions(new Transaction[]{Transaction.makeCoinbaseTx("coinbase","this is the genesis block")});
         block.setNonce(0);
         block.setHash(HashUtil.hash(block));
         return block;

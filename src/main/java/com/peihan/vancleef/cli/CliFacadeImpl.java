@@ -3,6 +3,7 @@ package com.peihan.vancleef.cli;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
+import com.peihan.vancleef.model.Transaction;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +23,7 @@ public class CliFacadeImpl implements CliFacade {
     @Override
     public void addBlock(String data) throws ServiceException {
         blockChain.createBlockChain();
-        blockChain.addBlock(data);
+        blockChain.addBlock(new Transaction[]{Transaction.makeCoinbaseTx("TTT",data)});
     }
 
     @Override

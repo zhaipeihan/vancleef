@@ -33,12 +33,16 @@ public class Transaction {
     private TxOutput[] txOutputs;
 
 
-    public Transaction makeCoinbaseTx(String to, String data) {
-        TxOutput txOutput = new TxOutput(REWARD,to);
-        TxInput txInput = new TxInput("0",-1,data);
 
-        Transaction transaction = new Transaction(null,new TxInput[]{txInput},new TxOutput[]{txOutput});
+    //创世区块中的交易
+    public static Transaction makeCoinbaseTx(String to, String data) {
+        TxOutput txOutput = new TxOutput(REWARD, to);
+        TxInput txInput = new TxInput("0", -1, data);
+
+        Transaction transaction = new Transaction(null, new TxInput[]{txInput}, new TxOutput[]{txOutput});
         transaction.setTxId(HashUtil.hash(SerializeUtil.serialize(transaction)));
         return transaction;
     }
+
+
 }

@@ -19,6 +19,7 @@ dependencies {
     compile group: 'org.rocksdb', name: 'rocksdbjni', version: '5.11.3'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+    compile group: 'com.google.guava', name: 'guava', version: '25.0-jre'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
