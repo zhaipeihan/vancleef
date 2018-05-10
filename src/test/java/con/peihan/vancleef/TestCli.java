@@ -26,4 +26,11 @@ public class TestCli {
         Cli cli = new Cli(args);
         cli.start();
     }
+
+    @Test
+    public void testbalanceCli() throws Exception {
+        String[] args = {"vcf","-balance","peihan"};
+        Cli cli = new Cli(args);
+        cli.start();
+    }
 }

@@ -21,4 +21,11 @@ public interface CliFacade {
 
     void showAllBlocks() throws ServiceException;
 
+
+    /**
+     * 获取给定地址的余额
+     * @return
+     */
+    long getBalance(String address);
+
 }

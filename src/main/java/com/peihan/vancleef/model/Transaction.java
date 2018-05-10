@@ -48,5 +48,18 @@ public class Transaction {
         return transaction;
     }
 
+    /**
+     * 是否是创币交易
+     * @return
+     */
+    public boolean isCoinbase(){
+        if(this.txInputs != null && this.txInputs.size() == 1
+                && this.txInputs.get(0).getTxOutputIndex() == -1
+                && this.txInputs.get(0).getTxId().equals("0")){
+            return true;
+        }
+        return false;
+    }
+
 
 }

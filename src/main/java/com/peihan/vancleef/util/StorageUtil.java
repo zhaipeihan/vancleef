@@ -66,38 +66,38 @@ public class StorageUtil {
     }
 
 
-    public Block getBlock(String hash) throws ServiceException {
+    public Block getBlock(String hash) {
         if (StringUtils.isEmpty(hash)) {
-            throw new ServiceException("hash不能为空");
+            throw new SystemException("hash不能为空");
         }
         Block block = null;
         try {
             block = (Block) SerializeUtil.deSerialize(rocksDB.get(SerializeUtil.serialize(hash)));
         } catch (Exception e) {
             logger.error("get block error! hash:{},exception{}", hash, e);
-            throw new OperateFailedException(String.format("hash值为%s的区块get异常", hash));
+            throw new SystemException(String.format("hash值为%s的区块get异常", hash));
         }
         return block;
     }
 
 
-    public String getLastBlockHash() throws ServiceException {
+    public String getLastBlockHash() {
         String lastHash = null;
         try {
             lastHash = (String) SerializeUtil.deSerialize(rocksDB.get(SerializeUtil.serialize(LAST_BLOCK_HASH)));
         } catch (Exception e) {
             logger.error("get lastHash error! exception{}", e);
-            throw new OperateFailedException("get lastHash error");
+            throw new SystemException("get lastHash error");
         }
         return lastHash;
     }
 
-    public void putLastBlockHash(String lastHash) throws ServiceException {
+    public void putLastBlockHash(String lastHash) {
         try {
             rocksDB.put(SerializeUtil.serialize(LAST_BLOCK_HASH), SerializeUtil.serialize(lastHash));
         } catch (Exception e) {
             logger.error("put lastHash error! exception{}", e);
-            throw new OperateFailedException("get lastHash error");
+            throw new SystemException("get lastHash error");
         }
     }
 

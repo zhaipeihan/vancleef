@@ -38,4 +38,9 @@ public class CliFacadeImpl implements CliFacade {
             }
         }
     }
+
+    @Override
+    public long getBalance(String address) {
+        return blockChain.getBalance(address);
+    }
 }

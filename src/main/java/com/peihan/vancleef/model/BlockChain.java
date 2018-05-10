@@ -3,17 +3,15 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.base.ServiceException;
-import com.peihan.vancleef.exception.base.SystemException;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 区块链
@@ -55,16 +53,11 @@ public class BlockChain {
             if (StringUtils.isEmpty(currentBlockHash)) {
                 return false;
             }
-            Block block = null;
-            try {
-                block = storage.getBlock(currentBlockHash);
-            } catch (ServiceException e) {
-                logger.error("get block error exception:{}", e);
-            }
+            Block block = storage.getBlock(currentBlockHash);
             return block != null;
         }
 
-        public Block next() throws ServiceException {
+        public Block next() {
             Block block = storage.getBlock(currentBlockHash);
             currentBlockHash = block.getPreviousHash();
             return block;
@@ -107,13 +100,115 @@ public class BlockChain {
     }
 
 
-    public List<Block> getAllBlocks() throws ServiceException {
+    public List<Block> getAllBlocks() {
         List<Block> blocks = new ArrayList<>();
         BlockChainIterator iterator = getBlockChainIterator();
         while (iterator.hasNext()) {
             blocks.add(iterator.next());
         }
         return blocks;
+    }
+
+
+
+    public long getBalance(String address){
+        List<TxOutput> UTXOs = getAllUTXOs(address);
+        long total = 0;
+
+        for (TxOutput utxo : UTXOs) {
+            if(utxo != null){
+                total += utxo.getValue();
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * 获取给定地址的未花费的交易输出
+     * UTXO: 未花费的交易输出
+     * @param address
+     * @return
+     */
+    private List<TxOutput> getAllUTXOs(String address) {
+
+        Map<String, List<Integer>> allSTXO = getAllSTXOs(address);
+
+
+        List<TxOutput> allUTXO = new ArrayList<>();
+
+
+        BlockChainIterator iterator = getBlockChainIterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (block == null) {
+                continue;
+            }
+
+            for (Transaction transaction : block.getTransactions()) {
+                List<Integer> spentOutputIndex = allSTXO.get(transaction.getTxId());
+                boolean needCheck = !CollectionUtils.isEmpty(spentOutputIndex);
+                ListIterator listIterator = transaction.getTxOutputs().listIterator();
+
+                while (listIterator.hasNext()) {
+                    TxOutput txOutput = (TxOutput) listIterator.next();
+                    if ((txOutput == null)
+                            || (needCheck && spentOutputIndex.contains(listIterator.nextIndex()))) {
+                        continue;
+                    }
+
+                    if(txOutput.canBeUnlockedWith(address)){
+                        allUTXO.add(txOutput);
+                    }
+                }
+            }
+        }
+        return allUTXO;
+    }
+
+
+    /**
+     * 获取给定地址的所有交易中花费掉的交易输出
+     * STXO : 花费的交易输出
+     *
+     * @param address
+     * @return
+     */
+    private Map<String, List<Integer>> getAllSTXOs(String address) {
+
+        Map<String, List<Integer>> allSTXO = new HashMap<>();
+
+        BlockChainIterator iterator = getBlockChainIterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (block == null) {
+                continue;
+            }
+
+            for (Transaction transaction : block.getTransactions()) {
+                if (transaction == null || transaction.isCoinbase()) {
+                    continue;
+                }
+
+                for (TxInput txInput : transaction.getTxInputs()) {
+                    if (txInput == null) {
+                        continue;
+                    }
+                    if (txInput.canBeUnlockedWith(address)) {
+                        if (allSTXO.get(txInput.getTxId()) == null) {
+                            List<Integer> outputIndexs = new ArrayList<>();
+                            outputIndexs.add(txInput.getTxOutputIndex());
+                            allSTXO.put(txInput.getTxId(), outputIndexs);
+                        } else {
+                            allSTXO.get(txInput.getTxId()).add(txInput.getTxOutputIndex());
+                        }
+                    }
+                }
+            }
+        }
+        return allSTXO;
     }
 
 
@@ -152,11 +247,7 @@ public class BlockChain {
     }
 
     private void refreshLastBlockHash() {
-        try {
-            this.lastBlockHash = storage.getLastBlockHash();
-        } catch (ServiceException e) {
-            throw new SystemException("refresh last block hash error!");
-        }
+        this.lastBlockHash = storage.getLastBlockHash();
     }
 
 

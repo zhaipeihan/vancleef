@@ -2,6 +2,10 @@ package con.peihan.vancleef;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 public class TestAll {
 
 
@@ -18,10 +22,34 @@ public class TestAll {
 
         int a = 1;
         int b = 2;
-        String aa= "1";
+        String aa = "1";
 
         String ss = a + b + aa;
         System.out.println(ss);
     }
 
+    @Test
+    public void name() throws Exception {
+
+
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+
+
+        ListIterator listIterator = list.listIterator();
+
+        while (listIterator.hasNext()) {
+            System.out.print("index:" + listIterator.nextIndex() + "    ");
+
+
+            System.out.println(listIterator.next());
+
+
+        }
+
+
+    }
 }

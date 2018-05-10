@@ -23,7 +23,8 @@ public class Cli {
 
         INIT(0, "init", "init the blockchains"),
         LIST(1, "list", "show all blocks"),
-        ADD(2, "add", "add a block");
+        ADD(2, "add", "add a block"),
+        BALANCE(3, "balance", "query balance of the address");
 
         @Getter
         private int index;
@@ -55,6 +56,9 @@ public class Cli {
         } else if (commandLine.hasOption(Order.ADD.getOption())) {
             String data = commandLine.getOptionValue(Order.ADD.getOption());
             cliFacade.addBlock(data);
+        } else if (commandLine.hasOption(Order.BALANCE.getOption())) {
+            String data = commandLine.getOptionValue(Order.BALANCE.getOption());
+            System.out.println(cliFacade.getBalance(data));
         } else {
             help();
         }
@@ -73,8 +77,10 @@ public class Cli {
         Option init = Option.builder(Order.INIT.getOption()).hasArg(true).desc(Order.INIT.getDesc()).build();
         Option start = Option.builder(Order.LIST.getOption()).desc(Order.LIST.getDesc()).build();
         Option add = Option.builder(Order.ADD.getOption()).hasArg(true).desc(Order.ADD.getDesc()).build();
+        Option balance = Option.builder(Order.BALANCE.getOption()).hasArg(true).desc(Order.BALANCE.getDesc()).build();
         options.addOption(init);
         options.addOption(start);
         options.addOption(add);
+        options.addOption(balance);
     }
 }

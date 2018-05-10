@@ -24,4 +24,10 @@ public class TxInput {
      * 解锁脚本
      */
     private String scriptKey;
+
+
+    public boolean canBeUnlockedWith(String unlockingData) {
+        return this.getScriptKey().endsWith(unlockingData);
+    }
+
 }

@@ -20,4 +20,9 @@ public class TxOutput {
      */
     private String scriptPubKey;
 
+
+    public boolean canBeUnlockedWith(String unlockingData) {
+        return this.getScriptPubKey().endsWith(unlockingData);
+    }
+
 }
