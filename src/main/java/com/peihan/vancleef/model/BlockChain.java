@@ -3,6 +3,7 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.base.ServiceException;
+import com.peihan.vancleef.exception.base.SystemException;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
@@ -11,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,6 +37,10 @@ public class BlockChain {
             }
         }
         return INSTANCE;
+    }
+
+    public BlockChain() {
+        refreshLastBlockHash();
     }
 
     public class BlockChainIterator {
@@ -78,10 +84,10 @@ public class BlockChain {
      * 创建区块链
      * 先查看rocksdb里有没有对应的区块链信息，如果有，从rocksdb里创建，否则创建新的区块链
      */
-    public void createBlockChain() throws ServiceException {
+    public void createBlockChain(String address) throws ServiceException {
         String lastBlockHash = storage.getLastBlockHash();
         if (StringUtils.isEmpty(lastBlockHash)) {
-            initBlockChain();
+            initBlockChain(address);
         } else {
             refreshLastBlockHash();
         }
@@ -90,7 +96,7 @@ public class BlockChain {
     /**
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
-    public void addBlock(Transaction[] transactions) throws ServiceException {
+    public void addBlock(List<Transaction> transactions) throws ServiceException {
         Block block = new Block();
         block.setTransactions(transactions);
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
@@ -104,7 +110,7 @@ public class BlockChain {
     public List<Block> getAllBlocks() throws ServiceException {
         List<Block> blocks = new ArrayList<>();
         BlockChainIterator iterator = getBlockChainIterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             blocks.add(iterator.next());
         }
         return blocks;
@@ -115,11 +121,11 @@ public class BlockChain {
      * 获取创世区块
      * 创世区块nonce为0
      */
-    private Block makeGenesisBlock() {
+    private Block makeGenesisBlock(String address) {
         Block block = new Block();
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setTransactions(new Transaction[]{Transaction.makeCoinbaseTx("coinbase","this is the genesis block")});
+        block.setTransactions(new ArrayList<>(Collections.singleton(Transaction.makeCoinbaseTx(address, "this is the coinbase"))));
         block.setNonce(0);
         block.setHash(HashUtil.hash(block));
         return block;
@@ -128,8 +134,8 @@ public class BlockChain {
     /**
      * 初始化区块链，并且增加一个创世区块
      */
-    private void initBlockChain() throws ServiceException {
-        Block genesisBlock = makeGenesisBlock();
+    private void initBlockChain(String address) throws ServiceException {
+        Block genesisBlock = makeGenesisBlock(address);
         addBlock(genesisBlock);
     }
 
@@ -145,8 +151,12 @@ public class BlockChain {
         refreshLastBlockHash();
     }
 
-    private void refreshLastBlockHash() throws ServiceException {
-        this.lastBlockHash = storage.getLastBlockHash();
+    private void refreshLastBlockHash() {
+        try {
+            this.lastBlockHash = storage.getLastBlockHash();
+        } catch (ServiceException e) {
+            throw new SystemException("refresh last block hash error!");
+        }
     }
 
 

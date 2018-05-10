@@ -7,6 +7,7 @@ import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.SerializeUtil;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TestSerializeUtil {
@@ -16,7 +17,7 @@ public class TestSerializeUtil {
         Block block = new Block();
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
-        block.setTransactions(new Transaction[]{});
+        block.setTransactions(new ArrayList<>());
         block.setNonce(0);
         block.setHash(HashUtil.hash(block));
 

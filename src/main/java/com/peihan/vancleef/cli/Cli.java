@@ -50,7 +50,8 @@ public class Cli {
         if (commandLine.hasOption(Order.LIST.getOption())) {
             cliFacade.showAllBlocks();
         } else if (commandLine.hasOption(Order.INIT.getOption())) {
-            cliFacade.initBlockChain();
+            String address = commandLine.getOptionValue(Order.INIT.getOption());
+            cliFacade.initBlockChain(address);
         } else if (commandLine.hasOption(Order.ADD.getOption())) {
             String data = commandLine.getOptionValue(Order.ADD.getOption());
             cliFacade.addBlock(data);
@@ -69,7 +70,7 @@ public class Cli {
     }
 
     private void initOptions() {
-        Option init = Option.builder(Order.INIT.getOption()).desc(Order.INIT.getDesc()).build();
+        Option init = Option.builder(Order.INIT.getOption()).hasArg(true).desc(Order.INIT.getDesc()).build();
         Option start = Option.builder(Order.LIST.getOption()).desc(Order.LIST.getDesc()).build();
         Option add = Option.builder(Order.ADD.getOption()).hasArg(true).desc(Order.ADD.getDesc()).build();
         options.addOption(init);

@@ -7,6 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 public class TestBlockChain {
 
     private static final Logger logger = LogManager.getLogger();
@@ -14,8 +16,8 @@ public class TestBlockChain {
     @Test
     public void testBlockChain() throws Exception {
         BlockChain blockChain = new BlockChain();
-        blockChain.createBlockChain();
-        blockChain.addBlock(new Transaction[]{});
+        blockChain.createBlockChain("test");
+        blockChain.addBlock(new ArrayList<>());
         BlockChain.BlockChainIterator blockChainIterator = blockChain.getBlockChainIterator();
         while (blockChainIterator.hasNext()){
             Block block = blockChainIterator.next();

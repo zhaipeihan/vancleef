@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,13 +30,12 @@ public class Transaction {
     /**
      * 交易输入
      */
-    private TxInput[] txInputs;
+    private List<TxInput> txInputs;
 
     /**
      * 交易输出
      */
-    private TxOutput[] txOutputs;
-
+    private List<TxOutput> txOutputs;
 
 
     //创世区块中的交易
@@ -39,7 +43,7 @@ public class Transaction {
         TxOutput txOutput = new TxOutput(REWARD, to);
         TxInput txInput = new TxInput("0", -1, data);
 
-        Transaction transaction = new Transaction(null, new TxInput[]{txInput}, new TxOutput[]{txOutput});
+        Transaction transaction = new Transaction(null, new ArrayList<>(Collections.singletonList(txInput)),new ArrayList<>(Collections.singletonList(txOutput)));
         transaction.setTxId(HashUtil.hash(SerializeUtil.serialize(transaction)));
         return transaction;
     }

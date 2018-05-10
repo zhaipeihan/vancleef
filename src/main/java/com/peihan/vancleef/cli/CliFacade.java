@@ -9,7 +9,7 @@ public interface CliFacade {
      * 初始化区块链
      * @throws ServiceException
      */
-    void initBlockChain() throws ServiceException;
+    void initBlockChain(String address) throws ServiceException;
 
     /**
      * 增加区块

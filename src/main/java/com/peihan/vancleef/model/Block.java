@@ -6,6 +6,8 @@ import com.peihan.vancleef.exception.base.ServiceException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 @Data
 public class Block {
 
@@ -21,9 +23,8 @@ public class Block {
 
     /**
      * 交易数据
-     *
      */
-    private Transaction[] transactions;
+    private List<Transaction> transactions;
 
     /**
      * 时间戳

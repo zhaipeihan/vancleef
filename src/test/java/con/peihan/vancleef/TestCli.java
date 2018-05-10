@@ -8,7 +8,7 @@ public class TestCli {
 
     @Test
     public void testinitCli() throws Exception {
-        String[] args = {"vcf", "-init"};
+        String[] args = {"vcf", "-init","peihan"};
         Cli cli = new Cli(args);
         cli.start();
     }

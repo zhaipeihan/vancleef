@@ -3,6 +3,9 @@ package com.peihan.vancleef.util;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.CollectionUtils;
+
+import java.util.List;
 
 public class HashUtil {
 
@@ -37,8 +40,8 @@ public class HashUtil {
      * @param transactions
      * @return
      */
-    public static String hash(Transaction[] transactions) {
-        if (transactions == null || transactions.length == 0) {
+    public static String hash(List<Transaction> transactions) {
+        if (CollectionUtils.isEmpty(transactions)) {
             return "";
         }
 
