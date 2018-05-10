@@ -44,7 +44,7 @@ public class Transaction {
         TxInput txInput = new TxInput("0", -1, data);
 
         Transaction transaction = new Transaction(null, new ArrayList<>(Collections.singletonList(txInput)), new ArrayList<>(Collections.singletonList(txOutput)));
-        transaction.setTxId(HashUtil.hash(SerializeUtil.serialize(transaction)));
+        transaction.setTxId(HashUtil.hash(transaction));
         return transaction;
     }
 

@@ -34,6 +34,10 @@ public class HashUtil {
         return DigestUtils.sha256Hex(bytes);
     }
 
+    public static String hash(Transaction transaction) {
+        return hash(SerializeUtil.serialize(transaction));
+    }
+
     /**
      * 计算一组交易信息的hash值
      *

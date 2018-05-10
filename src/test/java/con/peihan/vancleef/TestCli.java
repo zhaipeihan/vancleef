@@ -2,6 +2,8 @@ package con.peihan.vancleef;
 
 import com.peihan.vancleef.App;
 import com.peihan.vancleef.cli.Cli;
+import com.peihan.vancleef.facade.BlockChainFacade;
+import com.peihan.vancleef.facade.BlockChainFacadeImpl;
 import org.junit.Test;
 
 public class TestCli {
@@ -32,5 +34,11 @@ public class TestCli {
         String[] args = {"vcf","-balance","peihan"};
         Cli cli = new Cli(args);
         cli.start();
+    }
+
+    @Test
+    public void testSendCli() throws Exception {
+        BlockChainFacade blockChainFacade = new BlockChainFacadeImpl();
+        blockChainFacade.transfer("lushu","peihan",3);
     }
 }

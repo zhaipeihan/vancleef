@@ -10,12 +10,14 @@ public interface BlockChainFacade {
 
     /**
      * 初始化区块链
+     *
      * @throws ServiceException
      */
     void initBlockChain(String address) throws ServiceException;
 
     /**
      * 增加区块
+     *
      * @param data
      * @throws ServiceException
      */
@@ -26,8 +28,12 @@ public interface BlockChainFacade {
 
     /**
      * 获取给定地址的余额
+     *
      * @return
      */
     long getBalance(String address);
+
+
+    void transfer(String from, String to, int amount) throws ServiceException;
 
 }

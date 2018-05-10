@@ -36,4 +36,9 @@ public class BlockChainFacadeImpl implements BlockChainFacade {
     public long getBalance(String address) {
         return blockChain.getBalance(address);
     }
+
+    @Override
+    public void transfer(String from, String to, int amount) throws ServiceException {
+        blockChain.transfer(from,to,amount);
+    }
 }

@@ -1,12 +1,15 @@
 package com.peihan.vancleef.model;
 
 
+import com.google.common.collect.Collections2;
 import com.peihan.vancleef.action.Pow;
+import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,9 +25,9 @@ public class BlockChain {
 
     private final StorageUtil storage = StorageUtil.getInstance();
 
-    private String lastBlockHash;
-
     private volatile static BlockChain INSTANCE;
+
+    private String lastBlockHash;
 
     public static BlockChain getInstance() {
         if (INSTANCE == null) {
@@ -39,6 +42,12 @@ public class BlockChain {
 
     public BlockChain() {
         refreshLastBlockHash();
+    }
+
+    public void transfer(String from, String to, int amount) throws ServiceException {
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(makeNormalTx(from,to,amount));
+        addBlock(transactions);
     }
 
     public class BlockChainIterator {
@@ -128,6 +137,95 @@ public class BlockChain {
         }
 
         return total;
+    }
+
+
+    /**
+     * 创建普通交易
+     *
+     * @param from
+     * @param to
+     * @param amount
+     * @return
+     */
+    private Transaction makeNormalTx(String from, String to, int amount) throws OperateFailedException {
+
+        //该地址下的所有的UXTO
+        Map<String, List<TxOutput>> allUXTOs = getAllUTXOs(from);
+
+        //获取用来创建交易的UXTO
+        SpentUXTO spentUXTO = makeSpentUXTOs(allUXTOs, amount);
+
+        if (spentUXTO == null || spentUXTO.getTotal() < amount) {
+            throw new OperateFailedException(String.format("%s has no enough UXTO", from));
+        }
+
+
+        List<TxInput> txInputs = new ArrayList<>();
+        List<TxOutput> txOutputs = new ArrayList<>();
+
+        for (Map.Entry<String, List<TxOutput>> entry : spentUXTO.getUXTOs().entrySet()) {
+            String txId = entry.getKey();
+            List<TxOutput> txSpentOutputs = entry.getValue();
+
+            for (TxOutput txSpentOutput : txSpentOutputs) {
+                TxInput txInput = new TxInput(txId, txSpentOutput.getIndex(), from);
+                txInputs.add(txInput);
+            }
+        }
+
+        txOutputs.add(new TxOutput(0, amount, to));
+
+        if (spentUXTO.getTotal() > amount) {
+            txOutputs.add(new TxOutput(1, spentUXTO.getTotal() - amount, from));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxInputs(txInputs);
+        transaction.setTxOutputs(txOutputs);
+        transaction.setTxId(HashUtil.hash(transaction));
+        return transaction;
+    }
+
+    private SpentUXTO makeSpentUXTOs(Map<String, List<TxOutput>> UXTOs, int amount) {
+        if (MapUtils.isEmpty(UXTOs)) {
+            return null;
+        }
+
+        SpentUXTO spentUXTO = new SpentUXTO();
+        Map<String, List<TxOutput>> spentUXTOs = new HashMap<>();
+
+        int total = 0;
+
+        for (Map.Entry<String, List<TxOutput>> entry : UXTOs.entrySet()) {
+            String k = entry.getKey();
+            List<TxOutput> txOutputs = entry.getValue();
+            if (!CollectionUtils.isEmpty(txOutputs)) {
+                for (TxOutput txOutput : txOutputs) {
+                    if (txOutput == null) {
+                        continue;
+                    }
+                    if (total < amount) {
+                        total += txOutput.getValue();
+                        if (spentUXTOs.get(k) == null) {
+                            List<TxOutput> spentTxOutputs = new ArrayList<>();
+                            spentTxOutputs.add(txOutput);
+                            spentUXTOs.put(k, spentTxOutputs);
+                        } else {
+                            spentUXTOs.get(k).add(txOutput);
+                        }
+                    } else {
+                        spentUXTO.setTotal(total);
+                        spentUXTO.setUXTOs(spentUXTOs);
+                        return spentUXTO;
+
+                    }
+                }
+            }
+        }
+        spentUXTO.setTotal(total);
+        spentUXTO.setUXTOs(spentUXTOs);
+        return spentUXTO;
     }
 
     /**

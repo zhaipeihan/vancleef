@@ -3,12 +3,16 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.exception.InvalidBlockException;
 import com.peihan.vancleef.exception.base.ServiceException;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Block {
 
     /**
