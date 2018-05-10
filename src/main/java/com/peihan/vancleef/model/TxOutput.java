@@ -11,6 +11,11 @@ import lombok.NoArgsConstructor;
 public class TxOutput {
 
     /**
+     * 输出索引
+     */
+    private int index;
+
+    /**
      * 数值
      */
     private int value;

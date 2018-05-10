@@ -22,7 +22,7 @@ public class TestCli {
 
     @Test
     public void testAddCli() throws Exception {
-        String[] args = {"vcf","-add","tow block"};
+        String[] args = {"vcf","-add","peihan"};
         Cli cli = new Cli(args);
         cli.start();
     }

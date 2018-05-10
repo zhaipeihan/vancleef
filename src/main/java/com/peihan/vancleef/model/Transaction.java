@@ -38,24 +38,25 @@ public class Transaction {
     private List<TxOutput> txOutputs;
 
 
-    //创世区块中的交易
-    public static Transaction makeCoinbaseTx(String to, String data) {
-        TxOutput txOutput = new TxOutput(REWARD, to);
+    //创币交易
+    public static Transaction makeCoinbaseTx(String address, String data) {
+        TxOutput txOutput = new TxOutput(0, REWARD, address);
         TxInput txInput = new TxInput("0", -1, data);
 
-        Transaction transaction = new Transaction(null, new ArrayList<>(Collections.singletonList(txInput)),new ArrayList<>(Collections.singletonList(txOutput)));
+        Transaction transaction = new Transaction(null, new ArrayList<>(Collections.singletonList(txInput)), new ArrayList<>(Collections.singletonList(txOutput)));
         transaction.setTxId(HashUtil.hash(SerializeUtil.serialize(transaction)));
         return transaction;
     }
 
     /**
      * 是否是创币交易
+     *
      * @return
      */
-    public boolean isCoinbase(){
-        if(this.txInputs != null && this.txInputs.size() == 1
+    public boolean isCoinbase() {
+        if (this.txInputs != null && this.txInputs.size() == 1
                 && this.txInputs.get(0).getTxOutputIndex() == -1
-                && this.txInputs.get(0).getTxId().equals("0")){
+                && this.txInputs.get(0).getTxId().equals("0")) {
             return true;
         }
         return false;

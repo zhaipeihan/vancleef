@@ -110,14 +110,20 @@ public class BlockChain {
     }
 
 
-
-    public long getBalance(String address){
-        List<TxOutput> UTXOs = getAllUTXOs(address);
+    public long getBalance(String address) {
+        Map<String, List<TxOutput>> UTXOs = getAllUTXOs(address);
         long total = 0;
 
-        for (TxOutput utxo : UTXOs) {
-            if(utxo != null){
-                total += utxo.getValue();
+
+        for (Map.Entry<String, List<TxOutput>> entry : UTXOs.entrySet()) {
+            List<TxOutput> v = entry.getValue();
+            if (CollectionUtils.isEmpty(v)) {
+                continue;
+            }
+            for (TxOutput utxo : v) {
+                if (utxo != null) {
+                    total += utxo.getValue();
+                }
             }
         }
 
@@ -127,17 +133,14 @@ public class BlockChain {
     /**
      * 获取给定地址的未花费的交易输出
      * UTXO: 未花费的交易输出
+     *
      * @param address
      * @return
      */
-    private List<TxOutput> getAllUTXOs(String address) {
+    private Map<String, List<TxOutput>> getAllUTXOs(String address) {
 
-        Map<String, List<Integer>> allSTXO = getAllSTXOs(address);
-
-
-        List<TxOutput> allUTXO = new ArrayList<>();
-
-
+        Map<String, List<Integer>> allSTXOs = getAllSTXOs(address);
+        Map<String, List<TxOutput>> allUTXOs = new HashMap<>();
         BlockChainIterator iterator = getBlockChainIterator();
 
         while (iterator.hasNext()) {
@@ -147,24 +150,28 @@ public class BlockChain {
             }
 
             for (Transaction transaction : block.getTransactions()) {
-                List<Integer> spentOutputIndex = allSTXO.get(transaction.getTxId());
+                List<Integer> spentOutputIndex = allSTXOs.get(transaction.getTxId());
                 boolean needCheck = !CollectionUtils.isEmpty(spentOutputIndex);
-                ListIterator listIterator = transaction.getTxOutputs().listIterator();
 
-                while (listIterator.hasNext()) {
-                    TxOutput txOutput = (TxOutput) listIterator.next();
+                for (TxOutput txOutput : transaction.getTxOutputs()) {
                     if ((txOutput == null)
-                            || (needCheck && spentOutputIndex.contains(listIterator.nextIndex()))) {
+                            || (needCheck && spentOutputIndex.contains(txOutput.getIndex()))) {
                         continue;
                     }
+                    if (txOutput.canBeUnlockedWith(address)) {
 
-                    if(txOutput.canBeUnlockedWith(address)){
-                        allUTXO.add(txOutput);
+                        if (allUTXOs.get(transaction.getTxId()) == null) {
+                            List<TxOutput> txOutputs = new ArrayList<>();
+                            txOutputs.add(txOutput);
+                            allUTXOs.put(transaction.getTxId(), txOutputs);
+                        } else {
+                            allUTXOs.get(transaction.getTxId()).add(txOutput);
+                        }
                     }
                 }
             }
         }
-        return allUTXO;
+        return allUTXOs;
     }
 
 
