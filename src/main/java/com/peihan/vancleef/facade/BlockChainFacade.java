@@ -1,9 +1,12 @@
-package com.peihan.vancleef.cli;
+package com.peihan.vancleef.facade;
 
 
 import com.peihan.vancleef.exception.base.ServiceException;
+import com.peihan.vancleef.model.Block;
 
-public interface CliFacade {
+import java.util.List;
+
+public interface BlockChainFacade {
 
     /**
      * 初始化区块链
@@ -19,8 +22,7 @@ public interface CliFacade {
     void addBlock(String data) throws ServiceException;
 
 
-    void showAllBlocks() throws ServiceException;
-
+    List<Block> getAllBlocks() throws ServiceException;
 
     /**
      * 获取给定地址的余额

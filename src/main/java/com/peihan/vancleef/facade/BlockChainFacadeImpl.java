@@ -1,4 +1,4 @@
-package com.peihan.vancleef.cli;
+package com.peihan.vancleef.facade;
 
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
@@ -12,9 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CliFacadeImpl implements CliFacade {
+public class BlockChainFacadeImpl implements BlockChainFacade {
     private static final BlockChain blockChain = BlockChain.getInstance();
-
     private static final Logger logger = LogManager.getLogger();
 
     @Override
@@ -28,15 +27,9 @@ public class CliFacadeImpl implements CliFacade {
     }
 
     @Override
-    public void showAllBlocks() throws ServiceException {
-        List<Block> blocks = blockChain.getAllBlocks();
-        if (CollectionUtils.isEmpty(blocks)) {
-            logger.info("has no block");
-        } else {
-            for (Block block : blocks) {
-                logger.info(block);
-            }
-        }
+    public List<Block> getAllBlocks() throws ServiceException {
+        return blockChain.getAllBlocks();
+
     }
 
     @Override

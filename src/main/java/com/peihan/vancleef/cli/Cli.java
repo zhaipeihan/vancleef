@@ -1,20 +1,22 @@
 package com.peihan.vancleef.cli;
 
 import com.peihan.vancleef.exception.base.ServiceException;
+import com.peihan.vancleef.facade.BlockChainFacade;
+import com.peihan.vancleef.facade.BlockChainFacadeImpl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.cli.*;
 
 public class Cli {
 
-    private CliFacade cliFacade;
+    private CliProxy cliProxy;
     private Options options;
     private String[] args;
 
     public Cli(String[] args) {
         this.args = args;
         options = new Options();
-        cliFacade = new CliFacadeImpl();
+        cliProxy = new CliProxy();
     }
 
 
@@ -49,16 +51,16 @@ public class Cli {
 
         }
         if (commandLine.hasOption(Order.LIST.getOption())) {
-            cliFacade.showAllBlocks();
+            cliProxy.showAllBlocks();
         } else if (commandLine.hasOption(Order.INIT.getOption())) {
             String address = commandLine.getOptionValue(Order.INIT.getOption());
-            cliFacade.initBlockChain(address);
+            cliProxy.initBlockChain(address);
         } else if (commandLine.hasOption(Order.ADD.getOption())) {
             String data = commandLine.getOptionValue(Order.ADD.getOption());
-            cliFacade.addBlock(data);
+            cliProxy.addBlock(data);
         } else if (commandLine.hasOption(Order.BALANCE.getOption())) {
             String data = commandLine.getOptionValue(Order.BALANCE.getOption());
-            System.out.println(cliFacade.getBalance(data));
+            cliProxy.showBalance(data);
         } else {
             help();
         }
