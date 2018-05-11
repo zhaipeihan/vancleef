@@ -1,9 +1,5 @@
 package com.peihan.vancleef.util;
 
-
-import com.peihan.vancleef.model.Block;
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.nio.ByteBuffer;
 
 public class MagicUtil {

@@ -1,7 +1,7 @@
 package com.peihan.vancleef.model;
 
 
-import com.peihan.vancleef.util.HashUtil;
+import com.peihan.vancleef.util.WalletUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,8 +31,7 @@ public class TxInput {
     /**
      * 公钥（未hash）
      */
-    private byte[] pubKey;
-
+    private byte[] publicKey;
 
     /**
      * 检查公钥hash是否用于交易输入
@@ -41,7 +40,7 @@ public class TxInput {
      * @return
      */
     public boolean usesKey(byte[] pubKeyHash) {
-        byte[] lockingHash = HashUtil.ripemd160Hash(this.getPubKey());
+        byte[] lockingHash = WalletUtil.getPublicKeyHash(publicKey);
         return Arrays.equals(lockingHash, pubKeyHash);
     }
 

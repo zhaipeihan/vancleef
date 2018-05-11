@@ -1,5 +1,6 @@
 package com.peihan.vancleef.model;
 
+import com.peihan.vancleef.exception.base.SystemException;
 import lombok.Data;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
@@ -40,10 +41,11 @@ public class Wallet {
             this.setPrivateKey(privateKey);
             this.setPublicKey(publicKeyBytes);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SystemException("init wallet error!");
         }
 
     }
+
     /**
      * 创建新的密钥对
      *

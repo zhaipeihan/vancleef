@@ -37,6 +37,15 @@ public class WalletUtil {
     }
 
     /**
+     * 根据原始公钥生成公钥hash
+     * @param publicKey
+     * @return
+     */
+    public static byte[] getPublicKeyHash(byte[] publicKey) {
+        return HashUtil.ripemd160Hash(publicKey);
+    }
+
+    /**
      * 在publicKey的开头增加0x00的版本号
      *
      * @param source
@@ -45,6 +54,5 @@ public class WalletUtil {
     private static byte[] addVersion(byte[] source) {
         return MagicUtil.mergeBytes(new byte[]{0}, source);
     }
-
 
 }
