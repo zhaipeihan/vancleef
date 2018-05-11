@@ -43,11 +43,8 @@ public class TestAll {
 
         while (listIterator.hasNext()) {
             System.out.print("index:" + listIterator.nextIndex() + "    ");
-
-
             System.out.println(listIterator.next());
-
-
+            System.out.print("index:" + listIterator.nextIndex() + "    ");
         }
 
 

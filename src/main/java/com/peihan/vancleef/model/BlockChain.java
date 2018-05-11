@@ -150,7 +150,8 @@ public class BlockChain {
      */
     private Transaction makeNormalTx(String from, String to, int amount) throws OperateFailedException {
 
-        //该地址下的所有的UXTO
+        return null;
+       /* //该地址下的所有的UXTO
         Map<String, List<TxOutput>> allUXTOs = getAllUTXOs(from);
 
         //获取用来创建交易的UXTO
@@ -184,7 +185,7 @@ public class BlockChain {
         transaction.setTxInputs(txInputs);
         transaction.setTxOutputs(txOutputs);
         transaction.setTxId(HashUtil.hash(transaction));
-        return transaction;
+        return transaction;*/
     }
 
     private SpentUXTO makeSpentUXTOs(Map<String, List<TxOutput>> UXTOs, int amount) {
@@ -236,7 +237,8 @@ public class BlockChain {
      * @return
      */
     private Map<String, List<TxOutput>> getAllUTXOs(String address) {
-
+        return null;
+/*
         Map<String, List<Integer>> allSTXOs = getAllSTXOs(address);
         Map<String, List<TxOutput>> allUTXOs = new HashMap<>();
         BlockChainIterator iterator = getBlockChainIterator();
@@ -256,7 +258,7 @@ public class BlockChain {
                             || (needCheck && spentOutputIndex.contains(txOutput.getIndex()))) {
                         continue;
                     }
-                    if (txOutput.canBeUnlockedWith(address)) {
+                    if (txOutput.isLockedWithKey(address)) {
 
                         if (allUTXOs.get(transaction.getTxId()) == null) {
                             List<TxOutput> txOutputs = new ArrayList<>();
@@ -269,7 +271,7 @@ public class BlockChain {
                 }
             }
         }
-        return allUTXOs;
+        return allUTXOs;*/
     }
 
 
@@ -282,7 +284,7 @@ public class BlockChain {
      */
     private Map<String, List<Integer>> getAllSTXOs(String address) {
 
-        Map<String, List<Integer>> allSTXO = new HashMap<>();
+      /*  Map<String, List<Integer>> allSTXO = new HashMap<>();
 
         BlockChainIterator iterator = getBlockChainIterator();
 
@@ -313,7 +315,9 @@ public class BlockChain {
                 }
             }
         }
-        return allSTXO;
+        return allSTXO;*/
+
+      return null;
     }
 
 

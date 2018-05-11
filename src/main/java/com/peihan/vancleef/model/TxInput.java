@@ -1,9 +1,12 @@
 package com.peihan.vancleef.model;
 
 
+import com.peihan.vancleef.util.HashUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
 
 @Data
 @AllArgsConstructor
@@ -21,13 +24,25 @@ public class TxInput {
     private int txOutputIndex;
 
     /**
-     * 解锁脚本
+     * 签名
      */
-    private String scriptKey;
+    private byte[] signature;
+
+    /**
+     * 公钥（未hash）
+     */
+    private byte[] pubKey;
 
 
-    public boolean canBeUnlockedWith(String unlockingData) {
-        return this.getScriptKey().endsWith(unlockingData);
+    /**
+     * 检查公钥hash是否用于交易输入
+     *
+     * @param pubKeyHash
+     * @return
+     */
+    public boolean usesKey(byte[] pubKeyHash) {
+        byte[] lockingHash = HashUtil.ripemd160Hash(this.getPubKey());
+        return Arrays.equals(lockingHash, pubKeyHash);
     }
 
 }

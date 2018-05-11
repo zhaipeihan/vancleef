@@ -4,6 +4,7 @@ import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.Transaction;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
 import java.util.List;
 
@@ -55,6 +56,33 @@ public class HashUtil {
             stringBuilder.append(transaction.getTxId());
         }
         return DigestUtils.sha256Hex(stringBuilder.toString());
+    }
+
+    /**
+     * 计算公钥的 RIPEMD160 Hash值
+     * 此方法主要是用来根据公钥生成公钥hash
+     *
+     * @param pubKey 公钥
+     * @return byte[]
+     */
+    public static byte[] ripemd160Hash(byte[] pubKey) {
+        //1. 先对公钥做 sha256 处理
+        byte[] shaHashedKey = DigestUtils.sha256(pubKey);
+        RIPEMD160Digest ripemd160 = new RIPEMD160Digest();
+        ripemd160.update(shaHashedKey, 0, shaHashedKey.length);
+        byte[] output = new byte[ripemd160.getDigestSize()];
+        ripemd160.doFinal(output, 0);
+        return output;
+    }
+
+
+    /**
+     * 二次hash计算
+     * @param data
+     * @return
+     */
+    public static byte[] doubleHash(byte[] data) {
+        return DigestUtils.sha256(DigestUtils.sha256(data));
     }
 
 

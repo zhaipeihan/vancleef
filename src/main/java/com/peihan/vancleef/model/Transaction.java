@@ -5,11 +5,9 @@ import com.peihan.vancleef.util.SerializeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -40,11 +38,11 @@ public class Transaction {
 
     //创币交易
     public static Transaction makeCoinbaseTx(String address, String data) {
-        TxOutput txOutput = new TxOutput(0, REWARD, address);
-        TxInput txInput = new TxInput("0", -1, data);
-
+        TxOutput txOutput = TxOutput.makeTxOutput(REWARD, address);
+        TxInput txInput = new TxInput("0", -1, null, data.getBytes());
         Transaction transaction = new Transaction(null, new ArrayList<>(Collections.singletonList(txInput)), new ArrayList<>(Collections.singletonList(txOutput)));
         transaction.setTxId(HashUtil.hash(transaction));
+        transaction.refreshTxOutputIndex();
         return transaction;
     }
 
@@ -60,6 +58,17 @@ public class Transaction {
             return true;
         }
         return false;
+    }
+
+
+    public void refreshTxOutputIndex() {
+        if (!CollectionUtils.isEmpty(txOutputs)) {
+            ListIterator<TxOutput> iterator = txOutputs.listIterator();
+            while(iterator.hasNext()){
+                int index = iterator.nextIndex();
+                iterator.next().setIndex(index);
+            }
+        }
     }
 
 

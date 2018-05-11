@@ -1,9 +1,12 @@
 package com.peihan.vancleef.model;
 
 
+import com.peihan.vancleef.util.WalletUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
 
 @Data
 @NoArgsConstructor
@@ -21,13 +24,35 @@ public class TxOutput {
     private int value;
 
     /**
-     * 锁定脚本
+     * 公钥Hash
      */
-    private String scriptPubKey;
+    private byte[] publicKeyHash;
 
 
-    public boolean canBeUnlockedWith(String unlockingData) {
-        return this.getScriptPubKey().endsWith(unlockingData);
+    public TxOutput(int value, byte[] pubKeyHash) {
+        this.value = value;
+        this.publicKeyHash = pubKeyHash;
+    }
+
+    /**
+     * 创建交易输出
+     *
+     * @param value
+     * @param address
+     * @return
+     */
+    public static TxOutput makeTxOutput(int value, String address) {
+        return new TxOutput(value, WalletUtil.getPublicKeyHash(address));
+    }
+
+    /**
+     * 检查给定的pubkeyhash能否解锁交易输出
+     *
+     * @param pubKeyHash
+     * @return
+     */
+    public boolean isLockedWithKey(byte[] pubKeyHash) {
+        return Arrays.equals(this.publicKeyHash, pubKeyHash);
     }
 
 }
