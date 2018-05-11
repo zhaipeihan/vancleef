@@ -13,16 +13,16 @@ public class CliProxy {
 
     private BlockChainFacade blockChainFacade;
 
-    public CliProxy(){
+    public CliProxy() {
         blockChainFacade = new BlockChainFacadeImpl();
     }
 
 
     public void showAllBlocks() throws ServiceException {
         List<Block> blocks = blockChainFacade.getAllBlocks();
-        if(CollectionUtils.isEmpty(blocks)){
+        if (CollectionUtils.isEmpty(blocks)) {
             System.out.println("has no block!");
-        }else{
+        } else {
             for (Block block : blocks) {
                 System.out.println(block);
             }
@@ -38,6 +38,10 @@ public class CliProxy {
     }
 
     public void showBalance(String address) {
-        System.out.println(String.format("Balance of %s : %s",address,blockChainFacade.getBalance(address)));
+        System.out.println(String.format("Balance of %s : %s", address, blockChainFacade.getBalance(address)));
+    }
+
+    public void transfer(String from, String to, int amount) throws ServiceException {
+        blockChainFacade.transfer(from, to, amount);
     }
 }
