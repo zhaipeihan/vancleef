@@ -29,7 +29,7 @@ public class TxOutput {
     private byte[] publicKeyHash;
 
 
-    public TxOutput(int value, byte[] pubKeyHash) {
+    private TxOutput(int value, byte[] pubKeyHash) {
         this.value = value;
         this.publicKeyHash = pubKeyHash;
     }

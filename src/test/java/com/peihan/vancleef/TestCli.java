@@ -7,6 +7,8 @@ public class TestCli {
 
     private static final String peihan = "12eDgHAaLJ7g6AgHf2GhFresSxbvFaeJBZ";
 
+    private static final String lushu = "1J2PdRfKwsSxSbFm3rQs6ACFiZLmQGHaMR";
+
 
     @Test
     public void testInitCli() throws Exception {
@@ -24,14 +26,14 @@ public class TestCli {
 
     @Test
     public void testBalanceCli() throws Exception {
-        String[] args = {"balance", "-address", peihan};
+        String[] args = {"balance", "-address", lushu};
         Cli cli = new Cli(args);
         cli.start();
     }
 
     @Test
     public void testSendCli() throws Exception {
-        String[] args = {"send", "-from", "peihan", "-to", "lushu", "-amount", "5"};
+        String[] args = {"send", "-from", peihan, "-to", lushu, "-amount", "5"};
         Cli cli = new Cli(args);
         cli.start();
     }

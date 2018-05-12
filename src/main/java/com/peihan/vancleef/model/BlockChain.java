@@ -25,6 +25,8 @@ public class BlockChain {
 
     private final StorageUtil storage = StorageUtil.getInstance();
 
+    private final WalletManager walletManager = WalletManager.getInstance();
+
     private volatile static BlockChain INSTANCE;
 
     private String lastBlockHash;
@@ -150,8 +152,12 @@ public class BlockChain {
      */
     private Transaction makeNormalTx(String from, String to, int amount) throws OperateFailedException {
 
-        return null;
-       /* //该地址下的所有的UXTO
+        Wallet fromWallet = walletManager.getWallet(from);
+
+        if (fromWallet == null || fromWallet.getPrivateKey() == null || fromWallet.getPublicKey() == null) {
+            throw new OperateFailedException("get wallet error!");
+        }
+        //该地址下的所有的UXTO
         Map<String, List<TxOutput>> allUXTOs = getAllUTXOs(from);
 
         //获取用来创建交易的UXTO
@@ -170,22 +176,23 @@ public class BlockChain {
             List<TxOutput> txSpentOutputs = entry.getValue();
 
             for (TxOutput txSpentOutput : txSpentOutputs) {
-                TxInput txInput = new TxInput(txId, txSpentOutput.getIndex(), from);
+                TxInput txInput = new TxInput(txId, txSpentOutput.getIndex(), null, fromWallet.getPublicKey());
                 txInputs.add(txInput);
             }
         }
 
-        txOutputs.add(new TxOutput(0, amount, to));
+        txOutputs.add(TxOutput.makeTxOutput(amount, to));
 
         if (spentUXTO.getTotal() > amount) {
-            txOutputs.add(new TxOutput(1, spentUXTO.getTotal() - amount, from));
+            txOutputs.add(TxOutput.makeTxOutput(spentUXTO.getTotal() - amount, from));
         }
 
         Transaction transaction = new Transaction();
         transaction.setTxInputs(txInputs);
         transaction.setTxOutputs(txOutputs);
         transaction.setTxId(HashUtil.hash(transaction));
-        return transaction;*/
+        transaction.refreshTxOutputIndex();
+        return transaction;
     }
 
     private SpentUXTO makeSpentUXTOs(Map<String, List<TxOutput>> UXTOs, int amount) {
