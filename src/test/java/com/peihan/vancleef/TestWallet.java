@@ -1,4 +1,4 @@
-package con.peihan.vancleef;
+package com.peihan.vancleef;
 
 import com.peihan.vancleef.model.Wallet;
 import com.peihan.vancleef.util.HashUtil;

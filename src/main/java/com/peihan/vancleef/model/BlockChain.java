@@ -1,7 +1,6 @@
 package com.peihan.vancleef.model;
 
 
-import com.google.common.collect.Collections2;
 import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;

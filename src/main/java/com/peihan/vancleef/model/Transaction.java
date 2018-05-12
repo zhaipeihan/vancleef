@@ -1,7 +1,6 @@
 package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.util.HashUtil;
-import com.peihan.vancleef.util.SerializeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

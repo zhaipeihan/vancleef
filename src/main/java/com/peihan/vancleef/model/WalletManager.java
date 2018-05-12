@@ -3,7 +3,7 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.exception.base.SystemException;
 import com.peihan.vancleef.util.SerializeUtil;
-import lombok.Data;
+import com.peihan.vancleef.util.WalletUtil;
 
 import java.io.*;
 import java.util.HashMap;
@@ -12,7 +12,6 @@ import java.util.Map;
 /**
  * 管理多个wallet
  */
-@Data
 public class WalletManager {
 
     private volatile static WalletManager INSTANCE;
@@ -24,7 +23,7 @@ public class WalletManager {
 
 
     private WalletManager() {
-
+        init();
     }
 
     public static WalletManager getInstance() {
@@ -39,7 +38,7 @@ public class WalletManager {
     }
 
 
-    public void init() {
+    private void init() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
             this.walletMap = new HashMap<>(16);
@@ -56,6 +55,17 @@ public class WalletManager {
 
     public Wallet getWallet(String address) {
         return this.walletMap.getOrDefault(address, null);
+    }
+
+    public Map<String, Wallet> getAllWallets() {
+        return this.walletMap;
+    }
+
+    public String createWallet() {
+        Wallet wallet = new Wallet();
+        String address = WalletUtil.getAddress(wallet);
+        addWallet(address, wallet);
+        return address;
     }
 
     private void saveToFile() {

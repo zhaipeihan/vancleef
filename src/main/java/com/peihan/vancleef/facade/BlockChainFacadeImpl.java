@@ -4,7 +4,6 @@ import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
 import com.peihan.vancleef.model.Transaction;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

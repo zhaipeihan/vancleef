@@ -1,4 +1,4 @@
-package con.peihan.vancleef;
+package com.peihan.vancleef;
 
 import com.peihan.vancleef.cli.Cli;
 import org.junit.Test;

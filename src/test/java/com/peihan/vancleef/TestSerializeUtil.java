@@ -1,7 +1,6 @@
-package con.peihan.vancleef;
+package com.peihan.vancleef;
 
 import com.peihan.vancleef.model.Block;
-import com.peihan.vancleef.model.Transaction;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.SerializeUtil;

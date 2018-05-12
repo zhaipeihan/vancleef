@@ -1,8 +1,7 @@
-package con.peihan.vancleef;
+package com.peihan.vancleef;
 
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
-import com.peihan.vancleef.model.Transaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
