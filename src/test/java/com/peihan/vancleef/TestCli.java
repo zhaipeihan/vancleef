@@ -5,9 +5,12 @@ import org.junit.Test;
 
 public class TestCli {
 
+    private static final String peihan = "12eDgHAaLJ7g6AgHf2GhFresSxbvFaeJBZ";
+
+
     @Test
     public void testInitCli() throws Exception {
-        String[] args = {"init", "-address", "peihan"};
+        String[] args = {"init", "-address", peihan};
         Cli cli = new Cli(args);
         cli.start();
     }
@@ -21,7 +24,7 @@ public class TestCli {
 
     @Test
     public void testBalanceCli() throws Exception {
-        String[] args = {"balance", "-address", "peihan"};
+        String[] args = {"balance", "-address", peihan};
         Cli cli = new Cli(args);
         cli.start();
     }
@@ -33,5 +36,10 @@ public class TestCli {
         cli.start();
     }
 
-
+    @Test
+    public void testWalletCli() throws Exception {
+        String[] args = {"wallet"};
+        Cli cli = new Cli(args);
+        cli.start();
+    }
 }

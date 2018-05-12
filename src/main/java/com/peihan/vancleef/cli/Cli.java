@@ -30,7 +30,8 @@ public class Cli {
         INIT(0, "init"),
         LIST(1, "list"),
         BALANCE(3, "balance"),
-        SEND(4, "send");
+        SEND(4, "send"),
+        WALLET(5, "wallet");
 
         @Getter
         private int index;
@@ -78,7 +79,9 @@ public class Cli {
             String from = commandLine.getOptionValue(Arg.FROM.getOption());
             String to = commandLine.getOptionValue(Arg.TO.getOption());
             int amount = Integer.valueOf(commandLine.getOptionValue(Arg.AMOUNT.getOption()));
-            cliProxy.transfer(from,to,amount);
+            cliProxy.transfer(from, to, amount);
+        } else if(Objects.equals(order,Order.WALLET.getOption())){
+            cliProxy.createWallet();
         } else {
             help();
         }
@@ -106,6 +109,7 @@ public class Cli {
         System.out.println("  init -address [ADDRESS] (init blockchain)");
         System.out.println("  list (list all the blocks of the blockchain)");
         System.out.println("  send -from [FROM] -to [TO] -amount [AMOUNT] (Send AMOUNT of coins from FROM address to TO)");
+        System.out.println("  wallet (create a wallet and return a address)");
         System.exit(0);
     }
 }

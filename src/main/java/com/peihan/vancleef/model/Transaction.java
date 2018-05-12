@@ -63,7 +63,7 @@ public class Transaction {
     public void refreshTxOutputIndex() {
         if (!CollectionUtils.isEmpty(txOutputs)) {
             ListIterator<TxOutput> iterator = txOutputs.listIterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 int index = iterator.nextIndex();
                 iterator.next().setIndex(index);
             }

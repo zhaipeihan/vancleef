@@ -4,6 +4,8 @@ package com.peihan.vancleef.cli;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.facade.BlockChainFacade;
 import com.peihan.vancleef.facade.BlockChainFacadeImpl;
+import com.peihan.vancleef.facade.WalletFacade;
+import com.peihan.vancleef.facade.WalletFacadeImpl;
 import com.peihan.vancleef.model.Block;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -13,8 +15,11 @@ public class CliProxy {
 
     private BlockChainFacade blockChainFacade;
 
+    private WalletFacade walletFacade;
+
     public CliProxy() {
         blockChainFacade = new BlockChainFacadeImpl();
+        walletFacade = new WalletFacadeImpl();
     }
 
 
@@ -43,5 +48,10 @@ public class CliProxy {
 
     public void transfer(String from, String to, int amount) throws ServiceException {
         blockChainFacade.transfer(from, to, amount);
+    }
+
+    public void createWallet() {
+        String address = walletFacade.createWallet();
+        System.out.println(String.format("wallet address : %s",address));
     }
 }

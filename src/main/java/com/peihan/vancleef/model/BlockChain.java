@@ -7,6 +7,7 @@ import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
 import com.peihan.vancleef.util.StorageUtil;
+import com.peihan.vancleef.util.WalletUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +46,7 @@ public class BlockChain {
 
     public void transfer(String from, String to, int amount) throws ServiceException {
         List<Transaction> transactions = new ArrayList<>();
-        transactions.add(makeNormalTx(from,to,amount));
+        transactions.add(makeNormalTx(from, to, amount));
         addBlock(transactions);
     }
 
@@ -236,8 +237,6 @@ public class BlockChain {
      * @return
      */
     private Map<String, List<TxOutput>> getAllUTXOs(String address) {
-        return null;
-/*
         Map<String, List<Integer>> allSTXOs = getAllSTXOs(address);
         Map<String, List<TxOutput>> allUTXOs = new HashMap<>();
         BlockChainIterator iterator = getBlockChainIterator();
@@ -257,7 +256,7 @@ public class BlockChain {
                             || (needCheck && spentOutputIndex.contains(txOutput.getIndex()))) {
                         continue;
                     }
-                    if (txOutput.isLockedWithKey(address)) {
+                    if (txOutput.isLockedWithKey(WalletUtil.getPublicKeyHash(address))) {
 
                         if (allUTXOs.get(transaction.getTxId()) == null) {
                             List<TxOutput> txOutputs = new ArrayList<>();
@@ -270,7 +269,7 @@ public class BlockChain {
                 }
             }
         }
-        return allUTXOs;*/
+        return allUTXOs;
     }
 
 
@@ -283,7 +282,7 @@ public class BlockChain {
      */
     private Map<String, List<Integer>> getAllSTXOs(String address) {
 
-      /*  Map<String, List<Integer>> allSTXO = new HashMap<>();
+        Map<String, List<Integer>> allSTXO = new HashMap<>();
 
         BlockChainIterator iterator = getBlockChainIterator();
 
@@ -302,7 +301,7 @@ public class BlockChain {
                     if (txInput == null) {
                         continue;
                     }
-                    if (txInput.canBeUnlockedWith(address)) {
+                    if (txInput.usesKey(WalletUtil.getPublicKeyHash(address))) {
                         if (allSTXO.get(txInput.getTxId()) == null) {
                             List<Integer> outputIndexs = new ArrayList<>();
                             outputIndexs.add(txInput.getTxOutputIndex());
@@ -314,9 +313,7 @@ public class BlockChain {
                 }
             }
         }
-        return allSTXO;*/
-
-      return null;
+        return allSTXO;
     }
 
 
