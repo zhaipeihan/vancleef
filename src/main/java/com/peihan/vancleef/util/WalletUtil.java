@@ -26,6 +26,10 @@ public class WalletUtil {
         return Base58Util.bytesToBase58(addVersion(HashUtil.ripemd160Hash(publicKey)));
     }
 
+    public static String getAddress(Wallet wallet){
+        return getAddress(wallet.getPublicKey());
+    }
+
     /**
      * 进行地址到publicKeyHash的逆过程
      *
@@ -48,10 +52,6 @@ public class WalletUtil {
         return HashUtil.ripemd160Hash(publicKey);
     }
 
-
-    public static Wallet getWalletByAddress(String address) {
-        return StorageUtil.getInstance().getWallet(address);
-    }
 
     /**
      * 在publicKey的开头增加0x00的版本号
