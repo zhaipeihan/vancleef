@@ -5,10 +5,12 @@ import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.exception.base.SystemException;
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.model.Wallet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rocksdb.RocksDB;
+import org.rocksdb.RocksDBException;
 
 /**
  * 持久化工具类
@@ -99,6 +101,28 @@ public class StorageUtil {
             logger.error("put lastHash error! exception{}", e);
             throw new SystemException("get lastHash error");
         }
+    }
+
+
+    public void putWallet(String address, Wallet wallet) {
+        try {
+            rocksDB.put(SerializeUtil.JDKSerialize(address), SerializeUtil.JDKSerialize(wallet));
+        } catch (RocksDBException e) {
+            logger.error("put wallet error! exception {}", e);
+            throw new SystemException("put wallet error!");
+        }
+    }
+
+
+    public Wallet getWallet(String address) {
+        Wallet wallet = null;
+        try {
+            wallet = (Wallet) SerializeUtil.JDKDeSerialize(rocksDB.get(SerializeUtil.JDKSerialize(address)));
+        } catch (RocksDBException e) {
+            logger.error("get wallet error ! exception:{}", e);
+            throw new SystemException("get wallet error");
+        }
+        return wallet;
     }
 
 }

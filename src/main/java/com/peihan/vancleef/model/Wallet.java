@@ -8,13 +8,16 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.Security;
 
 @Data
-public class Wallet {
+public class Wallet implements Serializable {
+
+    private static final long serialVersionUID = 4592104333870382128L;
 
     /**
      * 私钥

@@ -1,6 +1,8 @@
 package com.peihan.vancleef.util;
 
 
+import com.peihan.vancleef.model.Wallet;
+
 import java.util.Arrays;
 
 /**
@@ -38,11 +40,17 @@ public class WalletUtil {
 
     /**
      * 根据原始公钥生成公钥hash
+     *
      * @param publicKey
      * @return
      */
     public static byte[] getPublicKeyHash(byte[] publicKey) {
         return HashUtil.ripemd160Hash(publicKey);
+    }
+
+
+    public static Wallet getWalletByAddress(String address) {
+        return StorageUtil.getInstance().getWallet(address);
     }
 
     /**
