@@ -2,6 +2,7 @@ package com.peihan.vancleef.util;
 
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.Transaction;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
@@ -28,15 +29,14 @@ public class HashUtil {
         return DigestUtils.sha256Hex(source);
     }
 
-    public static String hash(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
-            return "";
-        }
-        return DigestUtils.sha256Hex(bytes);
+    public static String hashHex(Transaction transaction) {
+        return Hex.encodeHexString(hash(transaction));
     }
 
-    public static String hash(Transaction transaction) {
-        return hash(SerializeUtil.serialize(transaction));
+    public static byte[] hash(Transaction transaction) {
+        Transaction copyTx = (Transaction) MagicUtil.cloneCopy(transaction);
+        copyTx.setTxId(null);
+        return DigestUtils.sha256(SerializeUtil.serialize(transaction));
     }
 
     /**
@@ -78,6 +78,7 @@ public class HashUtil {
 
     /**
      * 二次hash计算
+     *
      * @param data
      * @return
      */

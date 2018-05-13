@@ -1,6 +1,7 @@
 package com.peihan.vancleef.util;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class MagicUtil {
 
@@ -53,6 +54,11 @@ public class MagicUtil {
             buf.append(str);
         }
         return buf.toString();
+    }
+
+
+    public static Object cloneCopy(Object object) {
+        return SerializeUtil.deSerialize(SerializeUtil.serialize(object));
     }
 
 

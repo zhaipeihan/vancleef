@@ -3,6 +3,7 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.action.Pow;
 import com.peihan.vancleef.exception.OperateFailedException;
+import com.peihan.vancleef.exception.VerifyFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
@@ -13,6 +14,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 
 import java.util.*;
 
@@ -150,7 +152,7 @@ public class BlockChain {
      * @param amount
      * @return
      */
-    private Transaction makeNormalTx(String from, String to, int amount) throws OperateFailedException {
+    private Transaction makeNormalTx(String from, String to, int amount) throws OperateFailedException, VerifyFailedException {
 
         Wallet fromWallet = walletManager.getWallet(from);
 
@@ -190,9 +192,44 @@ public class BlockChain {
         Transaction transaction = new Transaction();
         transaction.setTxInputs(txInputs);
         transaction.setTxOutputs(txOutputs);
-        transaction.setTxId(HashUtil.hash(transaction));
+        transaction.setTxId(HashUtil.hashHex(transaction));
         transaction.refreshTxOutputIndex();
+
+        //用私钥对交易进行签名
+        signTransaction(transaction, fromWallet.getPrivateKey());
         return transaction;
+    }
+
+    private void signTransaction(Transaction transaction, BCECPrivateKey privateKey) throws OperateFailedException {
+        Map<String, Transaction> prevTxMap = getPrevTxMap(transaction);
+        try {
+            transaction.sign(privateKey, prevTxMap);
+        } catch (Exception e) {
+            throw new OperateFailedException("sign error");
+        }
+    }
+
+    private Map<String, Transaction> getPrevTxMap(Transaction transaction) throws OperateFailedException {
+        Map<String, Transaction> prevTxMap = new HashMap<>();
+        for (TxInput txInput : transaction.getTxInputs()) {
+            Transaction tx = getTransaction(txInput.getTxId());
+            prevTxMap.put(txInput.getTxId(), tx);
+        }
+        return prevTxMap;
+    }
+
+    private Transaction getTransaction(String txId) throws OperateFailedException {
+        BlockChainIterator iterator = getBlockChainIterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            for (Transaction transaction : block.getTransactions()) {
+                if (Objects.equals(txId, transaction.getTxId())) {
+                    return transaction;
+                }
+            }
+        }
+        throw new OperateFailedException("can not get transaction");
     }
 
     private SpentUXTO makeSpentUXTOs(Map<String, List<TxOutput>> UXTOs, int amount) {
