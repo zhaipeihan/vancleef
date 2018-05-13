@@ -51,6 +51,8 @@ public class BlockChain {
     public void transfer(String from, String to, int amount) throws ServiceException {
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(makeNormalTx(from, to, amount));
+        //增加一笔挖矿奖励
+        transactions.add(Transaction.makeCoinbaseTx(from, ""));
         addBlock(transactions);
     }
 
@@ -115,6 +117,9 @@ public class BlockChain {
 
     private void verifyTransactions(List<Transaction> transactions) throws OperateFailedException, VerifyFailedException {
         for (Transaction transaction : transactions) {
+            if (transaction.isCoinbase()) {
+                continue;
+            }
             if (!verifyTransaction(transaction)) {
                 throw new VerifyFailedException("Invalid transaction");
             }
