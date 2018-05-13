@@ -2,14 +2,25 @@ package com.peihan.vancleef.model;
 
 import com.peihan.vancleef.exception.VerifyFailedException;
 import com.peihan.vancleef.util.HashUtil;
+import com.peihan.vancleef.util.SignatureUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.bouncycastle.math.ec.ECPoint;
 
-import java.security.*;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.Signature;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,6 +28,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transaction {
+
+    private static final Logger logger = LogManager.getLogger();
 
     /**
      * 固定奖励
@@ -85,20 +98,14 @@ public class Transaction {
         //再次验证在preTxMap中是否找的到
         for (TxInput txInput : this.txInputs) {
             if (!prevTxMap.containsKey(txInput.getTxId()) || prevTxMap.get(txInput.getTxId()) == null) {
-                throw new VerifyFailedException(String.format("txId:%s can not found"));
+                throw new VerifyFailedException(String.format("txId:%s can not found", txInput.getTxId()));
             }
         }
 
         //获得交易副本
         Transaction duplicateTx = duplicate();
 
-
-        Security.addProvider(new BouncyCastleProvider());
-        Signature ecdsaSign = Signature.getInstance("SHA256withECDSA", BouncyCastleProvider.PROVIDER_NAME);
-        ecdsaSign.initSign(privateKey);
-
-
-        ListIterator<TxInput> iterator = this.duplicate().getTxInputs().listIterator();
+        ListIterator<TxInput> iterator = duplicateTx.getTxInputs().listIterator();
 
 
         while (iterator.hasNext()) {
@@ -112,22 +119,68 @@ public class Transaction {
             dupTxInput.setPublicKey(txOutput.getPublicKeyHash());
             dupTxInput.setSignature(null);
 
-            byte[] txId = HashUtil.hash(duplicateTx);
+
+            byte[] txIds = HashUtil.hash(duplicateTx);
 
             dupTxInput.setPublicKey(null);
 
-            ecdsaSign.update(txId);
-
-            byte[] signature = ecdsaSign.sign();
+            byte[] signature = SignatureUtil.sign(txIds, privateKey);
             this.txInputs.get(index).setSignature(signature);
         }
     }
 
-    private Transaction duplicate() {
+    public Transaction duplicate() {
         List<TxInput> txInputs = this.txInputs.stream().map(txInput -> new TxInput(txInput.getTxId(), txInput.getTxOutputIndex(), null, null)).collect(Collectors.toList());
         List<TxOutput> txOutputs = this.txOutputs.stream().map(txOutput -> new TxOutput(txOutput.getValue(), txOutput.getPublicKeyHash())).collect(Collectors.toList());
         Transaction transaction = new Transaction(this.getTxId(), txInputs, txOutputs);
         transaction.refreshTxOutputIndex();
         return transaction;
+    }
+
+    public boolean verify(Map<String, Transaction> prevTxMap) throws Exception {
+        //创币交易不需要签名
+        if (this.isCoinbase()) {
+            return true;
+        }
+
+        //再次验证在preTxMap中是否找的到
+        for (TxInput txInput : this.txInputs) {
+            if (!prevTxMap.containsKey(txInput.getTxId()) || prevTxMap.get(txInput.getTxId()) == null) {
+                throw new VerifyFailedException(String.format("txId:%s can not found"));
+            }
+        }
+
+        //获得交易副本
+        Transaction duplicateTx = duplicate();
+
+
+        ListIterator<TxInput> iterator = this.getTxInputs().listIterator();
+        while (iterator.hasNext()) {
+
+            int index = iterator.nextIndex();
+            TxInput txInput = iterator.next();
+
+            Transaction prevTx = prevTxMap.get(txInput.getTxId());
+
+
+            TxOutput prevTxOutput = prevTx.getTxOutputs().get(txInput.getTxOutputIndex());
+
+
+            TxInput copyTxInput = duplicateTx.getTxInputs().get(index);
+            copyTxInput.setSignature(null);
+            copyTxInput.setPublicKey(prevTxOutput.getPublicKeyHash());
+
+
+            byte[] txids = HashUtil.hash(duplicateTx);
+            copyTxInput.setPublicKey(null);
+
+
+
+            if (!SignatureUtil.verify(txids, txInput.getSignature(), txInput.getPublicKey())) {
+                return false;
+            }
+
+        }
+        return true;
     }
 }

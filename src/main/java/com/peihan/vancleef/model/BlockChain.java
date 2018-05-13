@@ -103,6 +103,7 @@ public class BlockChain {
      * 向区块链中添加一个区块，返回当前区块链中的最后索引
      */
     public void addBlock(List<Transaction> transactions) throws ServiceException {
+        verifyTransactions(transactions);
         Block block = new Block();
         block.setTransactions(transactions);
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
@@ -110,6 +111,14 @@ public class BlockChain {
         //需要进行执行pow算法
         Pow.pow(block);
         addBlock(block);
+    }
+
+    private void verifyTransactions(List<Transaction> transactions) throws OperateFailedException, VerifyFailedException {
+        for (Transaction transaction : transactions) {
+            if (!verifyTransaction(transaction)) {
+                throw new VerifyFailedException("Invalid transaction");
+            }
+        }
     }
 
 
@@ -206,6 +215,16 @@ public class BlockChain {
             transaction.sign(privateKey, prevTxMap);
         } catch (Exception e) {
             throw new OperateFailedException("sign error");
+        }
+    }
+
+
+    private boolean verifyTransaction(Transaction transaction) throws OperateFailedException {
+        Map<String, Transaction> prevTxMap = getPrevTxMap(transaction);
+        try {
+            return transaction.verify(prevTxMap);
+        } catch (Exception e) {
+            throw new OperateFailedException("verify error");
         }
     }
 
