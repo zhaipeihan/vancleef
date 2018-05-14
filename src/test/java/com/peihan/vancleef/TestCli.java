@@ -26,14 +26,14 @@ public class TestCli {
 
     @Test
     public void testBalanceCli() throws Exception {
-        String[] args = {"balance", "-address", peihan};
+        String[] args = {"balance", "-address", lushu};
         Cli cli = new Cli(args);
         cli.start();
     }
 
     @Test
     public void testSendCli() throws Exception {
-        String[] args = {"send", "-from", peihan, "-to", lushu, "-amount", "1"};
+        String[] args = {"send", "-from", peihan, "-to", lushu, "-amount", "5"};
         Cli cli = new Cli(args);
         cli.start();
     }
