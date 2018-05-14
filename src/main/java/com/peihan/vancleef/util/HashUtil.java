@@ -1,18 +1,26 @@
 package com.peihan.vancleef.util;
 
+import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.model.MerkleTree;
 import com.peihan.vancleef.model.Transaction;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class HashUtil {
 
+    public static String hashHex(String data) {
+        return DigestUtils.sha256Hex(data);
+    }
 
-    public static String hash(Block block) {
+
+    public static String hash(Block block) throws ServiceException {
         if (block == null) {
             return "";
         }
@@ -21,7 +29,7 @@ public class HashUtil {
         return DigestUtils.sha256Hex(source);
     }
 
-    public static String hashWithNonce(Block block, long nonce) {
+    public static String hashWithNonce(Block block, long nonce) throws ServiceException {
         if (block == null) {
             return "";
         }
@@ -45,17 +53,16 @@ public class HashUtil {
      * @param transactions
      * @return
      */
-    public static String hash(List<Transaction> transactions) {
+    public static String hash(List<Transaction> transactions) throws ServiceException {
         if (CollectionUtils.isEmpty(transactions)) {
             return "";
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-
+        List<String> txIds = new ArrayList<>(transactions.size());
         for (Transaction transaction : transactions) {
-            stringBuilder.append(transaction.getTxId());
+            txIds.add(transaction.getTxId());
         }
-        return DigestUtils.sha256Hex(stringBuilder.toString());
+        return MerkleTree.buildMerkleTree(txIds).getRootNode().getValue();
     }
 
     /**

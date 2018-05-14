@@ -1,5 +1,6 @@
 package com.peihan.vancleef.action;
 
+import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.util.HashUtil;
 import com.peihan.vancleef.util.MagicUtil;
@@ -19,7 +20,7 @@ public class Pow {
     private static int DIFFICULTY = 4;
 
 
-    public static void pow(Block block) {
+    public static void pow(Block block) throws ServiceException {
 
         long nonce = 0;
 

@@ -389,7 +389,7 @@ public class BlockChain {
      * 获取创世区块
      * 创世区块nonce为0
      */
-    private Block makeGenesisBlock(String address) {
+    private Block makeGenesisBlock(String address) throws ServiceException {
         Block block = new Block();
         block.setPreviousHash(MagicUtil.makeEmptyHashStr());
         block.setTimeStamp(MagicUtil.getNowTimeStamp());
