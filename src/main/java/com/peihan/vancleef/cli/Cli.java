@@ -1,11 +1,14 @@
 package com.peihan.vancleef.cli;
 
 import com.peihan.vancleef.exception.base.ServiceException;
+import io.netty.util.internal.SocketUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.cli.*;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Scanner;
 
 
 /**
@@ -16,10 +19,8 @@ public class Cli {
 
     private CliProxy cliProxy;
     private Options options;
-    private String[] args;
 
-    public Cli(String[] args) {
-        this.args = args;
+    public Cli() {
         options = new Options();
         cliProxy = new CliProxy();
     }
@@ -31,7 +32,9 @@ public class Cli {
         LIST(1, "list"),
         BALANCE(3, "balance"),
         SEND(4, "send"),
-        WALLET(5, "wallet");
+        WALLET(5, "wallet"),
+        PULL(6,"pull"),
+        EXIT(7,"exit");
 
         @Getter
         private int index;
@@ -53,7 +56,7 @@ public class Cli {
     }
 
 
-    public void start() throws ServiceException {
+    public void parse(String[] args) throws ServiceException {
 
         checkArgs();
         //初始化命令选项
@@ -64,6 +67,7 @@ public class Cli {
             commandLine = commandLineParser.parse(options, args);
         } catch (ParseException e) {
             help();
+            System.exit(0);
         }
         String order = args[0];
 
@@ -82,10 +86,27 @@ public class Cli {
             cliProxy.transfer(from, to, amount);
         } else if(Objects.equals(order,Order.WALLET.getOption())){
             cliProxy.createWallet();
-        } else {
+        } else if(Objects.equals(order,Order.PULL.getOption())){
+            cliProxy.pull();
+        }else if(Objects.equals(order,Order.EXIT.getOption())){
+            System.exit(0);
+        }else {
             help();
         }
 
+    }
+
+
+
+    public void ui() throws ServiceException {
+        help();
+        while(true){
+            System.out.println(">>>");
+            Scanner scanner = new Scanner(System.in);
+            String input = scanner.nextLine();
+            String[] args = input.split("\\s+");
+            parse(args);
+        }
     }
 
     private void checkArgs() {
@@ -110,6 +131,11 @@ public class Cli {
         System.out.println("  list (list all the blocks of the blockchain)");
         System.out.println("  send -from [FROM] -to [TO] -amount [AMOUNT] (Send AMOUNT of coins from FROM address to TO)");
         System.out.println("  wallet (create a wallet and return a address)");
-        System.exit(0);
+        System.out.println("  pull (pull from other node to execute consensus algorithm)");
     }
+
+
+
+
+
 }

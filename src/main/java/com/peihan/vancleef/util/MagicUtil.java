@@ -1,7 +1,12 @@
 package com.peihan.vancleef.util;
 
+import com.peihan.vancleef.p2p.NeighborNode;
+
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MagicUtil {
 
@@ -59,6 +64,14 @@ public class MagicUtil {
 
     public static Object cloneCopy(Object object) {
         return SerializeUtil.deSerialize(SerializeUtil.serialize(object));
+    }
+
+
+    public static Set<NeighborNode> getNeighborNodes(List<String> ipPorts) {
+        return ipPorts.stream().map(ipp -> {
+            String[] data = ipp.split(":");
+            return new NeighborNode(data[0],Integer.valueOf(data[1]));
+        }).collect(Collectors.toSet());
     }
 
 

@@ -1,6 +1,7 @@
 package com.peihan.vancleef.cli;
 
 
+import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.facade.BlockChainFacade;
 import com.peihan.vancleef.facade.BlockChainFacadeImpl;
@@ -53,5 +54,9 @@ public class CliProxy {
     public void createWallet() {
         String address = walletFacade.createWallet();
         System.out.println(String.format("wallet address : %s",address));
+    }
+
+    public void pull() throws OperateFailedException {
+        blockChainFacade.pull();
     }
 }

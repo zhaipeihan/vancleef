@@ -1,9 +1,14 @@
 package com.peihan.vancleef.facade;
 
+import com.peihan.vancleef.cache.NodeBlockCache;
+import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
 import com.peihan.vancleef.model.Transaction;
+import com.peihan.vancleef.p2p.Node;
+import com.peihan.vancleef.thread.NodeStartThread;
+import com.peihan.vancleef.util.MagicUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,5 +44,11 @@ public class BlockChainFacadeImpl implements BlockChainFacade {
     @Override
     public void transfer(String from, String to, int amount) throws ServiceException {
         blockChain.transfer(from,to,amount);
+    }
+
+
+    @Override
+    public void pull() throws OperateFailedException {
+        Node.getInstance().requestAllBlock();
     }
 }

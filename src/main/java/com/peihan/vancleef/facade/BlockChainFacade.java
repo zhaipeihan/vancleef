@@ -1,6 +1,7 @@
 package com.peihan.vancleef.facade;
 
 
+import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.model.Block;
 
@@ -36,4 +37,8 @@ public interface BlockChainFacade {
 
     void transfer(String from, String to, int amount) throws ServiceException;
 
+    /**
+     * 从网络中的其他节点获取区块数据并执行共识算法
+     */
+    void pull() throws OperateFailedException;
 }
