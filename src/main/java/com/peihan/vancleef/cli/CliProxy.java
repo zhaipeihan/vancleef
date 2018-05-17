@@ -56,7 +56,11 @@ public class CliProxy {
         System.out.println(String.format("wallet address : %s",address));
     }
 
-    public void pull() throws OperateFailedException {
+    public void pull() throws ServiceException {
         blockChainFacade.pull();
+    }
+
+    public void push() throws OperateFailedException {
+        blockChainFacade.push();
     }
 }

@@ -33,8 +33,9 @@ public class Cli {
         BALANCE(3, "balance"),
         SEND(4, "send"),
         WALLET(5, "wallet"),
-        PULL(6,"pull"),
-        EXIT(7,"exit");
+        PULL(6, "pull"),
+        PUSH(7, "push"),
+        EXIT(8, "exit");
 
         @Getter
         private int index;
@@ -84,23 +85,24 @@ public class Cli {
             String to = commandLine.getOptionValue(Arg.TO.getOption());
             int amount = Integer.valueOf(commandLine.getOptionValue(Arg.AMOUNT.getOption()));
             cliProxy.transfer(from, to, amount);
-        } else if(Objects.equals(order,Order.WALLET.getOption())){
+        } else if (Objects.equals(order, Order.WALLET.getOption())) {
             cliProxy.createWallet();
-        } else if(Objects.equals(order,Order.PULL.getOption())){
+        } else if (Objects.equals(order, Order.PULL.getOption())) {
             cliProxy.pull();
-        }else if(Objects.equals(order,Order.EXIT.getOption())){
+        } else if(Objects.equals(order,Order.PUSH.getOption())){
+            cliProxy.push();
+        } else if (Objects.equals(order, Order.EXIT.getOption())) {
             System.exit(0);
-        }else {
+        } else {
             help();
         }
 
     }
 
 
-
     public void ui() throws ServiceException {
         help();
-        while(true){
+        while (true) {
             System.out.println(">>>");
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
@@ -132,10 +134,8 @@ public class Cli {
         System.out.println("  send -from [FROM] -to [TO] -amount [AMOUNT] (Send AMOUNT of coins from FROM address to TO)");
         System.out.println("  wallet (create a wallet and return a address)");
         System.out.println("  pull (pull from other node to execute consensus algorithm)");
+        System.out.println("  push (push to other node to broadcast all blocks)");
     }
-
-
-
 
 
 }

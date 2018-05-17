@@ -424,40 +424,67 @@ public class BlockChain {
     }
 
 
+    //验证区块链是否有效
+    public boolean isBlockChainValid() throws ServiceException {
+        List<Block> blocks = getAllBlocks();
+        return isBlockChainValid(blocks);
+    }
 
 
-    /*
-    public boolean isBlockChainValid() {
-        if (blockChain == null || blockChain.size() < 1) {
+    //验证区块链是否有效
+    public boolean isBlockChainValid(List<Block> blocks) throws ServiceException {
+
+        if (CollectionUtils.isEmpty(blocks)) {
             return false;
         }
+
         //只有创世区块
-        else if (blockChain.size() == 1) {
-            Block block = blockChain.get(0);
+        else if (blocks.size() == 1) {
+            Block block = blocks.get(0);
             if (!Objects.equals(block.getPreviousHash(), "0")) {
                 return false;
             }
         } else {
             //从创世区块之后的第一个区块开始
-            for (int i = 1; i < blockChain.size(); i++) {
-                Block currentBlock = blockChain.get(i);
-                Block preBlock = blockChain.get(i - 1);
+            for (int i = 1; i < blocks.size(); i++) {
+                Block currentBlock = blocks.get(i);
+                Block preBlock = blocks.get(i - 1);
                 if (currentBlock == null || preBlock == null) {
                     return false;
                 }
                 //当前区块的hash必须和对整个区块做hash的结果一样
-                if (!Objects.equals(currentBlock.getHash(), MagicUtil.hash(currentBlock))) {
+                if (!Objects.equals(currentBlock.getHash(), HashUtil.hash(currentBlock))) {
                     return false;
                 }
                 //当前区块的preHash必须和前一个区块一样
-                if (!Objects.equals(currentBlock.getPreviousHash(), MagicUtil.hash(preBlock))) {
+                if (!Objects.equals(currentBlock.getPreviousHash(), HashUtil.hash(preBlock))) {
                     return false;
                 }
             }
         }
         return true;
     }
-    */
+
+
+    /**
+     * 共识算法
+     */
+    public void consensus(List<Block> otherNodeBlocks) throws ServiceException {
+        if (!isBlockChainValid(otherNodeBlocks)) {
+            return;
+        }
+
+        List<Block> blocks = getAllBlocks();
+
+        if (otherNodeBlocks.size() <= blocks.size()) {
+            return;
+        }
+
+        //每次都使用最长链替换当前节点
+        for (int i = blocks.size(); i < otherNodeBlocks.size(); i++) {
+            addBlock(otherNodeBlocks.get(i));
+        }
+    }
 
 
 }

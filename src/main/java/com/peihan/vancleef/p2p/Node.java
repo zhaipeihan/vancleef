@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.peihan.vancleef.config.Config;
 import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.SystemException;
+import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.p2p.handler.NodeClientHandler;
 import com.peihan.vancleef.p2p.handler.NodeServerHandler;
+import com.peihan.vancleef.p2p.handler.PushToOtherNodeHandler;
 import com.peihan.vancleef.util.MagicUtil;
+import com.peihan.vancleef.util.SerializeUtil;
 import com.peihan.vancleef.util.YamlUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -21,6 +24,7 @@ import io.netty.util.internal.SocketUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Set;
 
 public class Node {
@@ -35,9 +39,9 @@ public class Node {
 
 
     public static Node getInstance() throws OperateFailedException {
-        if(INSTANCE == null){
-            synchronized (Node.class){
-                if(INSTANCE == null){
+        if (INSTANCE == null) {
+            synchronized (Node.class) {
+                if (INSTANCE == null) {
                     Config config = YamlUtil.getConfig();
                     INSTANCE = new Node(config.getPort(), MagicUtil.getNeighborNodes(config.getIpPorts()));
                 }
@@ -82,11 +86,41 @@ public class Node {
 
             Channel ch = b.bind(0).sync().channel();
 
-            RequestMessage requestMessage = new RequestMessage(Action.GET_ALL_BLOCK);
+            RequestMessage requestMessage = new RequestMessage(Action.GET_ALL_BLOCK, null);
 
             for (NeighborNode neighborNode : this.neighborNodes) {
                 ch.writeAndFlush(new DatagramPacket(
-                        Unpooled.copiedBuffer(JSON.toJSONString(requestMessage), CharsetUtil.UTF_8),
+                        Unpooled.copiedBuffer(SerializeUtil.serialize(requestMessage)),
+                        SocketUtils.socketAddress(neighborNode.getIp(), neighborNode.getPort()))).sync();
+
+                if (!ch.closeFuture().await(5000)) {
+                    logger.error("ip:{},port:{},time out!");
+                }
+            }
+        } catch (Exception e) {
+            throw new SystemException("请求其他节点数据error");
+
+        } finally {
+            group.shutdownGracefully();
+        }
+    }
+
+    public void pushToOtherNode(List<Block> blocks) {
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap b = new Bootstrap();
+            b.group(group)
+                    .channel(NioDatagramChannel.class)
+                    .option(ChannelOption.SO_BROADCAST, true)
+                    .handler(new PushToOtherNodeHandler());
+
+            Channel ch = b.bind(0).sync().channel();
+
+            RequestMessage requestMessage = new RequestMessage(Action.PUSH_ALL_BLOCK, blocks);
+
+            for (NeighborNode neighborNode : this.neighborNodes) {
+                ch.writeAndFlush(new DatagramPacket(
+                        Unpooled.copiedBuffer(SerializeUtil.serialize(requestMessage)),
                         SocketUtils.socketAddress(neighborNode.getIp(), neighborNode.getPort()))).sync();
 
                 if (!ch.closeFuture().await(5000)) {

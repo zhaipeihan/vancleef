@@ -40,5 +40,7 @@ public interface BlockChainFacade {
     /**
      * 从网络中的其他节点获取区块数据并执行共识算法
      */
-    void pull() throws OperateFailedException;
+    void pull() throws ServiceException;
+
+    void push() throws OperateFailedException;
 }

@@ -27,14 +27,26 @@ public class NodeServerHandler extends SimpleChannelInboundHandler<DatagramPacke
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-        String request = msg.content().toString(CharsetUtil.UTF_8);
-        logger.info("request:{}", request);
-        RequestMessage requestMessage = JSON.parseObject(request, RequestMessage.class);
-        if (requestMessage != null && requestMessage.getAction() == Action.GET_ALL_BLOCK) {
+        ByteBuf byteBuf = msg.copy().content();
+        byte[] buf = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(buf);
+        RequestMessage requestMessage = (RequestMessage) SerializeUtil.deSerialize(buf);
+
+        if (requestMessage == null) {
+            ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer("ERROR", CharsetUtil.UTF_8), msg.sender()));
+            return;
+        }
+
+        if (requestMessage.getAction() == Action.GET_ALL_BLOCK) {
             List<Block> blocks = blockChain.getAllBlocks();
             byte[] response = SerializeUtil.serialize(blocks);
             logger.info("GET_ALL_BLOCK responce : {}", Arrays.toString(response));
             ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(response), msg.sender()));
+        } else if (requestMessage.getAction() == Action.PUSH_ALL_BLOCK) {
+            List<Block> blocks = (List<Block>) requestMessage.getData();
+            logger.info("PUSH_ALL_BLOCK request : {}", blocks);
+            blockChain.consensus(blocks);
+            ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(new byte[]{1}), msg.sender()));
         } else {
             ctx.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer("ERROR", CharsetUtil.UTF_8), msg.sender()));
         }

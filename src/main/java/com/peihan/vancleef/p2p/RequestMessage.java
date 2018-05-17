@@ -1,12 +1,17 @@
 package com.peihan.vancleef.p2p;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class RequestMessage {
+@NoArgsConstructor
+public class RequestMessage<T> {
     private Action action;
 
-    public RequestMessage(Action action) {
+    private T data;
+
+    public RequestMessage(Action action,T data) {
         this.action = action;
+        this.data = data;
     }
 }
