@@ -25,7 +25,7 @@ public class UTXOPool {
     }
 
 
-    public UTXOPool getInstance() {
+    public static UTXOPool getInstance() {
 
         if (INSTANCE == null) {
             synchronized (UTXOPool.class) {

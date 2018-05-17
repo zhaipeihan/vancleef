@@ -113,6 +113,8 @@ public class BlockChain {
         //需要进行执行pow算法
         Pow.pow(block);
         addBlock(block);
+        //更新缓存池
+        UTXOPool.getInstance().updateUXTOPool(block);
     }
 
     private void verifyTransactions(List<Transaction> transactions) throws OperateFailedException, VerifyFailedException {
@@ -138,7 +140,7 @@ public class BlockChain {
 
 
     public long getBalance(String address) {
-        Map<String, List<TxOutput>> UTXOs = getAllUTXOs(address);
+        Map<String, List<TxOutput>> UTXOs = UTXOPool.getInstance().getAllUTXOs(address);
         long total = 0;
 
 
@@ -174,7 +176,7 @@ public class BlockChain {
             throw new OperateFailedException("get wallet error!");
         }
         //该地址下的所有的UXTO
-        Map<String, List<TxOutput>> allUXTOs = getAllUTXOs(from);
+        Map<String, List<TxOutput>> allUXTOs = UTXOPool.getInstance().getAllUTXOs(from);
 
         //获取用来创建交易的UXTO
         SpentUXTO spentUXTO = makeSpentUXTOs(allUXTOs, amount);
