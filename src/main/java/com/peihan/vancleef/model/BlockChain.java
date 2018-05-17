@@ -386,6 +386,89 @@ public class BlockChain {
 
 
     /**
+     * 获取所有的未花费的交易输出
+     * UTXO: 未花费的交易输出
+     *
+     * @param
+     * @return
+     */
+    private Map<String, List<TxOutput>> getAllUTXOs() {
+        Map<String, List<Integer>> allSTXOs = getAllSTXOs();
+        Map<String, List<TxOutput>> allUTXOs = new HashMap<>();
+        BlockChainIterator iterator = getBlockChainIterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (block == null) {
+                continue;
+            }
+
+            for (Transaction transaction : block.getTransactions()) {
+                List<Integer> spentOutputIndex = allSTXOs.get(transaction.getTxId());
+                boolean needCheck = !CollectionUtils.isEmpty(spentOutputIndex);
+
+                for (TxOutput txOutput : transaction.getTxOutputs()) {
+                    if ((txOutput == null)
+                            || (needCheck && spentOutputIndex.contains(txOutput.getIndex()))) {
+                        continue;
+                    }
+
+                    if (allUTXOs.get(transaction.getTxId()) == null) {
+                        List<TxOutput> txOutputs = new ArrayList<>();
+                        txOutputs.add(txOutput);
+                        allUTXOs.put(transaction.getTxId(), txOutputs);
+                    } else {
+                        allUTXOs.get(transaction.getTxId()).add(txOutput);
+                    }
+                }
+            }
+        }
+        return allUTXOs;
+    }
+
+
+    /**
+     * 获取所有交易中花费掉的交易输出
+     * STXO : 花费的交易输出
+     *
+     * @param
+     * @return
+     */
+    private Map<String, List<Integer>> getAllSTXOs() {
+
+        Map<String, List<Integer>> allSTXO = new HashMap<>();
+
+        BlockChainIterator iterator = getBlockChainIterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (block == null) {
+                continue;
+            }
+
+            for (Transaction transaction : block.getTransactions()) {
+                if (transaction == null || transaction.isCoinbase()) {
+                    continue;
+                }
+
+                for (TxInput txInput : transaction.getTxInputs()) {
+                    if (txInput == null) {
+                        continue;
+                    }
+                    if (allSTXO.get(txInput.getTxId()) == null) {
+                        List<Integer> outputIndexs = new ArrayList<>();
+                        outputIndexs.add(txInput.getTxOutputIndex());
+                        allSTXO.put(txInput.getTxId(), outputIndexs);
+                    } else {
+                        allSTXO.get(txInput.getTxId()).add(txInput.getTxOutputIndex());
+                    }
+                }
+            }
+        }
+        return allSTXO;
+    }
+
+    /**
      * 获取创世区块
      * 创世区块nonce为0
      */

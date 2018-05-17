@@ -5,12 +5,18 @@ import com.peihan.vancleef.exception.OperateFailedException;
 import com.peihan.vancleef.exception.base.ServiceException;
 import com.peihan.vancleef.exception.base.SystemException;
 import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.model.TxInput;
+import com.peihan.vancleef.model.TxOutput;
 import com.peihan.vancleef.model.Wallet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 持久化工具类
@@ -24,6 +30,14 @@ public class StorageUtil {
 
     //区块链上最后一个区块的hash
     private static final String LAST_BLOCK_HASH = "l";
+
+
+    //存储UTXO集
+    private static final String CHAINSTATE = "chainstate";
+
+    //chainstate桶
+    private Map<String, List<TxOutput>> chainstateBucket;
+
 
     private RocksDB rocksDB;
 
@@ -43,6 +57,21 @@ public class StorageUtil {
     private StorageUtil() {
         //连接数据库
         connection();
+        initChainstateBucket();
+    }
+
+    private void initChainstateBucket() {
+        try {
+            Map<String, List<TxOutput>> chainstate = (Map<String, List<TxOutput>>) SerializeUtil.deSerialize(rocksDB.get(SerializeUtil.serialize(CHAINSTATE)));
+            if(chainstate == null){
+                this.chainstateBucket = new ConcurrentHashMap<>();
+                rocksDB.put(SerializeUtil.serialize(CHAINSTATE),SerializeUtil.serialize(chainstateBucket));
+            }else{
+                this.chainstateBucket = chainstate;
+            }
+        } catch (RocksDBException e) {
+            throw new SystemException("init chainstate bucket error!");
+        }
     }
 
     private void connection() {
@@ -104,7 +133,45 @@ public class StorageUtil {
     }
 
 
-    public void putWallet(String address, Wallet wallet) {
+    public List<TxOutput> getUXTOs(String key){
+        return this.chainstateBucket.getOrDefault(key,null);
+    }
+
+    public void putUXTOs(String key, List<TxOutput> txOutputs){
+        this.chainstateBucket.put(key,txOutputs);
+        flushChainstate();
+    }
+
+    public void cleanChainstateBucket(){
+        this.chainstateBucket.clear();
+        flushChainstate();
+    }
+
+    public void reGenerateChainstate(Map<String, List<TxOutput>> chainstate){
+        this.chainstateBucket = chainstate;
+        flushChainstate();
+        initChainstateBucket();
+    }
+
+
+    public Map<String,List<TxOutput>> getAllUTXOs(){
+        return this.chainstateBucket;
+    }
+
+    public void deleteUTXOs(String key){
+        this.chainstateBucket.remove(key);
+    }
+
+
+    private void flushChainstate(){
+        try {
+            rocksDB.put(SerializeUtil.serialize(CHAINSTATE),SerializeUtil.serialize(this.chainstateBucket));
+        } catch (RocksDBException e) {
+            throw new SystemException("put UXTO error");
+        }
+    }
+
+    /*public void putWallet(String address, Wallet wallet) {
         try {
             rocksDB.put(SerializeUtil.JDKSerialize(address), SerializeUtil.JDKSerialize(wallet));
         } catch (RocksDBException e) {
@@ -124,5 +191,5 @@ public class StorageUtil {
         }
         return wallet;
     }
-
+*/
 }

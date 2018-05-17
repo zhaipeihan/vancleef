@@ -1,36 +1,42 @@
 package com.peihan.vancleef;
 
+import com.peihan.vancleef.model.Block;
+import com.peihan.vancleef.model.BlockChain;
+import com.peihan.vancleef.model.TxOutput;
 import com.peihan.vancleef.model.Wallet;
 import com.peihan.vancleef.util.SerializeUtil;
 import com.peihan.vancleef.util.StorageUtil;
 import com.peihan.vancleef.util.WalletUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class TestStorge {
 
-
     @Test
     public void name() throws Exception {
-        Wallet wallet = new Wallet();
-        String address = WalletUtil.getAddress(wallet.getPublicKey());
 
         StorageUtil storageUtil = StorageUtil.getInstance();
-        storageUtil.putWallet(address, wallet);
-
-        Wallet getWallet = storageUtil.getWallet(address);
-
-        assert Arrays.equals(wallet.getPublicKey(), getWallet.getPublicKey());
-        assert wallet.getPrivateKey().equals(getWallet.getPrivateKey());
-        assert wallet.equals(getWallet);
-    }
 
 
-    @Test
-    public void name2() throws Exception {
-        Wallet wallet = new Wallet();
-        Wallet wallet1 = (Wallet) SerializeUtil.JDKDeSerialize(SerializeUtil.JDKSerialize(wallet));
-        assert wallet.getPrivateKey().equals(wallet1.getPrivateKey());
+        BlockChain blockChain = BlockChain.getInstance();
+
+
+        List<Block> blocks = blockChain.getAllBlocks();
+
+
+        Block block = blocks.get(1);
+
+
+        String txId = block.getTransactions().get(0).getTxId();
+        List<TxOutput> txOutputs = block.getTransactions().get(0).getTxOutputs();
+        storageUtil.putUXTOs(txId,txOutputs);
+
+        List<TxOutput> getUXTOs = storageUtil.getUXTOs(txId);
+
+        assert CollectionUtils.isEqualCollection(txOutputs,getUXTOs);
     }
 }
