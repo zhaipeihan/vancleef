@@ -1,7 +1,5 @@
 package com.peihan.vancleef.p2p.handler;
 
-import com.alibaba.fastjson.JSON;
-import com.oracle.javafx.jmx.json.JSONException;
 import com.peihan.vancleef.model.Block;
 import com.peihan.vancleef.model.BlockChain;
 import com.peihan.vancleef.p2p.Action;
