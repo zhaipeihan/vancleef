@@ -4,7 +4,7 @@ import com.peihan.vancleef.cli.Cli;
 import org.junit.Test;
 
 public class TestCli {
-
+/*
     private static final String peihan = "12eDgHAaLJ7g6AgHf2GhFresSxbvFaeJBZ";
     private static final String lushu = "1J2PdRfKwsSxSbFm3rQs6ACFiZLmQGHaMR";
     public static final String A = "162ZbBPNemMFWsoNZeSLoSApBciZEadEoa";
@@ -43,5 +43,5 @@ public class TestCli {
         String[] args = {"wallet"};
         Cli cli = new Cli();
         cli.parse(args);
-    }
+    }*/
 }
